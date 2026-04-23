@@ -68,6 +68,8 @@
                         <Button Content="Приход"     Command="{Binding RestockCommand}" MinWidth="96" Padding="8,6" Margin="0,0,6,0" />
                         <Button Content="Обновить"   Command="{Binding RefreshCommand}" MinWidth="96" Padding="8,6" />
                     </StackPanel>
+                    <Button Content="Экспорт в Excel" Command="{Binding ExportToExcelCommand}"
+                            HorizontalAlignment="Stretch" Padding="8,6" Margin="0,8,0,0" />
 
                     <TextBlock Text="{Binding ErrorMessage}"
                                Foreground="#DC2626"

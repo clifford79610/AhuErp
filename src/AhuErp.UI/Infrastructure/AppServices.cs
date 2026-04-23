@@ -51,6 +51,10 @@ namespace AhuErp.UI.Infrastructure
             services.AddSingleton<IInventoryService, InventoryService>();
             services.AddSingleton<IVehicleRepository>(new InMemoryVehicleRepository());
             services.AddSingleton<IFleetService>(sp => new FleetService(sp.GetRequiredService<IVehicleRepository>()));
+            services.AddSingleton<IReportService, ReportService>();
+
+            // UI-инфраструктура
+            services.AddSingleton<IFileDialogService, FileDialogService>();
 
             // ViewModels — transient, чтобы получать свежее состояние при навигации.
             services.AddTransient<LoginViewModel>();

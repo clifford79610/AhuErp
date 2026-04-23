@@ -1,8 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using AhuErp.Core.Models;
 using AhuErp.Core.Services;
+using AhuErp.UI.Infrastructure;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -19,6 +21,8 @@ namespace AhuErp.UI.ViewModels
         private readonly IInventoryService _inventoryService;
         private readonly IDocumentRepository _documents;
         private readonly IAuthService _auth;
+        private readonly IReportService _reports;
+        private readonly IFileDialogService _fileDialog;
 
         public ObservableCollection<InventoryItem> Items { get; }
 
@@ -49,12 +53,16 @@ namespace AhuErp.UI.ViewModels
         public WarehouseViewModel(IInventoryRepository inventory,
                                   IInventoryService inventoryService,
                                   IDocumentRepository documents,
-                                  IAuthService auth)
+                                  IAuthService auth,
+                                  IReportService reports,
+                                  IFileDialogService fileDialog)
         {
             _inventory = inventory ?? throw new ArgumentNullException(nameof(inventory));
             _inventoryService = inventoryService ?? throw new ArgumentNullException(nameof(inventoryService));
             _documents = documents ?? throw new ArgumentNullException(nameof(documents));
             _auth = auth ?? throw new ArgumentNullException(nameof(auth));
+            _reports = reports ?? throw new ArgumentNullException(nameof(reports));
+            _fileDialog = fileDialog ?? throw new ArgumentNullException(nameof(fileDialog));
 
             Items = new ObservableCollection<InventoryItem>();
             EligibleDocuments = new ObservableCollection<Document>();
@@ -78,6 +86,36 @@ namespace AhuErp.UI.ViewModels
 
         [RelayCommand]
         private void Refresh() => Reload();
+
+        [RelayCommand]
+        private void ExportToExcel()
+        {
+            ErrorMessage = null;
+            StatusMessage = null;
+            var path = _fileDialog.PromptSaveFile(
+                title: "Экспорт остатков ТМЦ в Excel",
+                filter: "Excel files (*.xlsx)|*.xlsx",
+                defaultFileName: $"inventory-{DateTime.Now:yyyyMMdd-HHmm}.xlsx");
+            if (string.IsNullOrWhiteSpace(path)) return;
+
+            try
+            {
+                _reports.ExportInventoryToExcel(path);
+                StatusMessage = $"Экспортировано: {path}";
+            }
+            catch (IOException ex)
+            {
+                ErrorMessage = $"Не удалось записать файл (возможно, он открыт в другой программе): {ex.Message}";
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                ErrorMessage = $"Нет прав для записи в указанный каталог: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
 
         private void Apply(int change, bool requireDocument, string successText)
         {

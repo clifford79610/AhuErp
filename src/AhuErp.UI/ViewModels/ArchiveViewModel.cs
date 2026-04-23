@@ -1,8 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using AhuErp.Core.Models;
 using AhuErp.Core.Services;
+using AhuErp.UI.Infrastructure;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -17,6 +19,8 @@ namespace AhuErp.UI.ViewModels
     {
         private readonly IDocumentRepository _documents;
         private readonly ArchiveService _archiveService;
+        private readonly IReportService _reports;
+        private readonly IFileDialogService _fileDialog;
 
         public ObservableCollection<ArchiveRequest> Requests { get; }
 
@@ -39,10 +43,18 @@ namespace AhuErp.UI.ViewModels
         [ObservableProperty]
         private string errorMessage;
 
-        public ArchiveViewModel(IDocumentRepository documents, ArchiveService archiveService)
+        [ObservableProperty]
+        private string statusMessage;
+
+        public ArchiveViewModel(IDocumentRepository documents,
+                                ArchiveService archiveService,
+                                IReportService reports,
+                                IFileDialogService fileDialog)
         {
             _documents = documents ?? throw new ArgumentNullException(nameof(documents));
             _archiveService = archiveService ?? throw new ArgumentNullException(nameof(archiveService));
+            _reports = reports ?? throw new ArgumentNullException(nameof(reports));
+            _fileDialog = fileDialog ?? throw new ArgumentNullException(nameof(fileDialog));
             Requests = new ObservableCollection<ArchiveRequest>();
             Reload();
         }
@@ -117,6 +129,38 @@ namespace AhuErp.UI.ViewModels
                 _archiveService.CompleteRequest(SelectedRequest);
                 _documents.Update(SelectedRequest);
                 Reload();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(HasSelection))]
+        private void GenerateCertificate()
+        {
+            ErrorMessage = null;
+            StatusMessage = null;
+            if (SelectedRequest == null) return;
+
+            var path = _fileDialog.PromptSaveFile(
+                title: "Сохранить архивную справку (Word)",
+                filter: "Word documents (*.docx)|*.docx",
+                defaultFileName: $"archive-certificate-{SelectedRequest.Id}.docx");
+            if (string.IsNullOrWhiteSpace(path)) return;
+
+            try
+            {
+                _reports.GenerateArchiveCertificate(SelectedRequest.Id, path);
+                StatusMessage = $"Справка сохранена: {path}";
+            }
+            catch (IOException ex)
+            {
+                ErrorMessage = $"Не удалось записать файл (возможно, он открыт в Word): {ex.Message}";
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                ErrorMessage = $"Нет прав для записи в указанный каталог: {ex.Message}";
             }
             catch (Exception ex)
             {

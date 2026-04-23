@@ -185,6 +185,27 @@ existingTrips.Any(t => t.VehicleId == vehicleId
 
 Вычисление инкапсулировано в `VehicleTrip.OverlapsWith(start, end)` и переиспользуется из обеих перегрузок `FleetService.BookVehicle`.
 
-## Roadmap (следующие фазы)
+## Phase 5 — Dashboard-аналитика и экспорт отчётов
 
-- Phase 5: Дашборд-аналитика (LiveCharts), экспорт в Excel/Word, аудит и отчётность.
+- **NuGet**: `ClosedXML 0.102.3` + `DocumentFormat.OpenXml 2.20.0` (в `AhuErp.Core`) и `LiveCharts.Wpf 0.9.7` (в `AhuErp.UI`). Все три пакета совместимы с `net48` и не требуют установленного MS Office.
+- **`IReportService`** (`AhuErp.Core`):
+  - `ExportInventoryToExcel(filePath)` — ClosedXML, лист «Склад ТМЦ», отформатированная шапка (bold + фон LightSteelBlue + нижняя граница), колонки `№ / Наименование / Категория / Остаток`, `Columns().AdjustToContents()`.
+  - `GenerateArchiveCertificate(archiveRequestId, filePath)` — DOCX через `WordprocessingDocument` + `DocumentFormat.OpenXml.Wordprocessing`. Заголовок «СПРАВКА о стаже», подстановка `№`, даты создания, темы, срока, статусов сканов паспорта/трудовой и выбор одного из двух формальных абзацев (полный пакет / требуется досбор).
+- **UI**:
+  - `WarehouseViewModel.ExportToExcelCommand` — `IFileDialogService.PromptSaveFile(...)` → `IReportService.ExportInventoryToExcel`. Отдельно обрабатываются `IOException` (файл занят), `UnauthorizedAccessException` и прочие `Exception`.
+  - `ArchiveViewModel.GenerateCertificateCommand` — аналогичный flow для Word-справки, активна только при выбранной заявке.
+  - `IFileDialogService` / `FileDialogService` — тонкая обёртка над `Microsoft.Win32.SaveFileDialog`, чтобы ViewModel оставался не зависящим от WPF-диалогов.
+- **Дашборд** (`DashboardViewModel` + `DashboardView.xaml`):
+  - KPI-карточки: просроченные архивные заявки, ТС в рейсе сейчас, ТМЦ с остатком < 5, всего просроченных документов, с дедлайном ≤ 3 дней.
+  - `lvc:PieChart` — распределение документов по `DocumentStatus`. `lvc:CartesianChart` с `ColumnSeries` — сумма остатков ТМЦ по категориям.
+  - Данные собираются в `Task.Run(...)` → `ConfigureAwait(true)`, UI-поток не блокируется. Повторная загрузка доступна через `RefreshCommand`. `IsLoading` гасит кнопку и показывает индикатор «Загрузка…».
+- **DI** (`AppServices.ConfigureServices`): `IReportService → ReportService` (singleton) и `IFileDialogService → FileDialogService` добавлены рядом с другими сервисами; `DashboardViewModel` уже был зарегистрирован и отображается первым пунктом навигации — значит, для ролей `Admin` и `Manager` он автоматически открывается при входе (см. конструктор `MainViewModel`, выбор первого `IsAllowed` элемента).
+- **Тесты**: `ReportServiceTests` — `+4` теста (XLSX-шапка и строки, DOCX с полным пакетом сканов, DOCX-follow-up при отсутствии сканов, ошибка при отсутствующей заявке). XLSX открывается обратно через ClosedXML, DOCX — через `System.IO.Packaging` + `word/document.xml`, без MS Office. Итого **82 / 82** зелёных.
+
+### LiveCharts DataContext-биндинги
+
+`PieChart.Series` и `CartesianChart.Series` биндятся к `SeriesCollection`-свойствам `DocumentStatusSeries` и `InventoryByCategorySeries` в `DashboardViewModel`. `CartesianChart.AxisX.Labels` биндится к `string[] InventoryCategoryLabels`. `DashboardViewModel` наследует `ViewModelBase : ObservableObject` (CommunityToolkit.Mvvm), поэтому `[ObservableProperty]` генерирует `INotifyPropertyChanged`-уведомления, и LiveCharts перестраивает диаграммы при каждом `RefreshAsync()`. Важно: `SeriesCollection` собирается в фоновом `Task.Run`, но применяется к VM в UI-потоке через `await ... .ConfigureAwait(true)` — LiveCharts поддерживает только UI-поточное обновление.
+
+## Roadmap (будущие итерации)
+
+- Аудит-лог и отчётность (кто/что/когда), а также полная миграция in-memory репозиториев на реальный `AhuDbContext`/EF6 (сейчас DI-слой готов к подмене без изменений ViewModel).
