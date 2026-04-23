@@ -19,4 +19,18 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
 
+  <!--
+    EF6 ожидает, что для каждой миграции <Stamp>_<Name>.cs соответствующий
+    .resx эмбедится с логическим именем "<Namespace>.<Name>.resources" (без
+    штампа даты), т.к. MigrationScaffolder в Designer.cs вызывает
+    `new ResourceManager(typeof(<Name>))`. SDK-style проект по умолчанию
+    подставляет штамп в LogicalName — переопределяем явным правилом.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Remove="Migrations\*_*.resx" />
+    <EmbeddedResource Include="Migrations\*_*.resx">
+      <LogicalName>AhuErp.Core.Migrations.$([System.String]::Copy('%(Filename)').Substring($([System.String]::Copy('%(Filename)').IndexOf('_'))).Substring(1)).resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

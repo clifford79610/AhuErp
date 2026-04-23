@@ -1,4 +1,5 @@
 using System;
+using System.Data.Entity.Migrations;
 using System.Data.Entity.Migrations.Design;
 using System.IO;
 using AhuErp.Core.Migrations;
@@ -6,10 +7,12 @@ using AhuErp.Core.Migrations;
 namespace AhuErp.Tools.MigrationGenerator
 {
     /// <summary>
-    /// Одноразовый генератор первой миграции EF6. Запускается через <c>mono</c>
-    /// на Linux или <c>dotnet</c> на Windows. Выводит файлы
-    /// <c>&lt;stamp&gt;_InitialCreate.cs / .Designer.cs / .resx</c> в указанную
-    /// папку. Не входит в основной solution, используется только в CI/скриптах.
+    /// Скаффолдер EF6-миграций. Запускается через <c>mono</c> на Linux или
+    /// <c>dotnet</c> на Windows. Перед скаффолдингом принудительно применяет
+    /// все уже существующие миграции к целевой БД (из <c>App.config</c>), так
+    /// чтобы <see cref="MigrationScaffolder"/> видел только delta новой модели.
+    /// Пишет <c>&lt;stamp&gt;_&lt;Name&gt;.cs / .Designer.cs / .resx</c>
+    /// в указанную папку. Не входит в основной <c>.sln</c> — вспомогательный.
     /// </summary>
     internal static class Program
     {
@@ -22,7 +25,19 @@ namespace AhuErp.Tools.MigrationGenerator
 
             Directory.CreateDirectory(migrationsDir);
 
-            var scaffolder = new MigrationScaffolder(new Configuration());
+            var configuration = new Configuration();
+
+            // Приводим БД к состоянию последнего закоммиченного снапшота —
+            // без этого MigrationScaffolder сочтёт существующие миграции
+            // «pending» и откажется генерировать дельту. Явно ограничиваем
+            // апдейт последней уже написанной миграцией — иначе EF6 попытается
+            // «доехать» до текущей модели через AutomaticMigrations.
+            var migrator = new DbMigrator(configuration);
+            string lastLocal = null;
+            foreach (var id in migrator.GetLocalMigrations()) lastLocal = id;
+            if (lastLocal != null) migrator.Update(lastLocal);
+
+            var scaffolder = new MigrationScaffolder(configuration);
             var result = scaffolder.Scaffold(migrationName, ignoreChanges: false);
 
             var stamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");

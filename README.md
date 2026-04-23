@@ -125,9 +125,18 @@ mono tools/MigrationGenerator/bin/Debug/MigrationGenerator.exe \
 - xUnit 2.9
 - Ref. assemblies: `Microsoft.NETFramework.ReferenceAssemblies 1.0.3`
 
+## Phase 2 — DI, Authentication & Office/Archive CRUD
+
+- Добавлен DI-контейнер `Microsoft.Extensions.DependencyInjection` в `App.xaml.cs`, регистрирующий сервисы (`IAuthService`, `IPasswordHasher`, репозитории) и все ViewModel-и.
+- `EmployeeRole` (Admin / Manager / Archivist / TechSupport / WarehouseManager) и `PasswordHash` добавлены к `Employee`. Миграция `AddEmployeeAuth` (`20260423125626`) добавляет соответствующие колонки.
+- `IAuthService`/`AuthService` + PBKDF2-`Pbkdf2PasswordHasher` с константным сравнением. `LoginWindow` показывается первым при старте приложения; `MainWindow` открывается только после успешной аутентификации.
+- RBAC: `RolePolicy` — декларативная таблица «роль → доступные модули»; `MainViewModel` фильтрует `NavigationItems` по текущему пользователю, `BooleanToVisibilityConverter` скрывает недоступные пункты меню.
+- CRUD экраны «Канцелярия» (Incoming/Internal документы, `OfficeView`) и «Архив» (`ArchiveRequest` со скан-чекбоксами и действием «Завершить», `ArchiveView`) — работают поверх `IDocumentRepository` (in-memory на Phase 2, EF6 на Phase 3+).
+- Демо-пользователи (пароль `password`): «Иванов Иван Иванович» (Admin), «Петров Пётр Петрович» (Manager), «Сидорова Анна Сергеевна» (Archivist), «Кузнецов Алексей Викторович» (TechSupport), «Орлова Мария Николаевна» (WarehouseManager).
+- Тесты: **+38** — `AuthServiceTests`, `PasswordHasherTests`, `RolePolicyTests`, `InMemoryDocumentRepositoryTests`. Итого 59 зелёных.
+
 ## Roadmap (следующие фазы)
 
-- Phase 2: CRUD экранов «Канцелярия» и «Архив», привязка к `AhuDbContext` через DI-контейнер.
-- Phase 3: Подсистема «Автопарк» с календарным представлением и бронированиями.
-- Phase 4: IT-service (Help Desk), импорт/экспорт документов.
-- Phase 5: Ролевой доступ, аудит, отчётность.
+- Phase 3: «Склад / ТМЦ» (InventoryItem, списания привязанные к документам) + IT-service (Help Desk).
+- Phase 4: «Автопарк» с календарным представлением и бронированиями поверх `FleetService`.
+- Phase 5: Дашборд-аналитика (LiveCharts), экспорт в Excel/Word, аудит и отчётность.

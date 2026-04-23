@@ -6,24 +6,21 @@
         xmlns:vm="clr-namespace:AhuErp.UI.ViewModels"
         xmlns:views="clr-namespace:AhuErp.UI.Views"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         Title="АХУ ERP/EDMS — МКУ АХУ БМР"
         Height="720" Width="1200"
         MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen">
-
-    <Window.DataContext>
-        <vm:MainViewModel />
-    </Window.DataContext>
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:OfficeViewModel}">
-            <views:PlaceholderView />
+            <views:OfficeView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ArchiveViewModel}">
-            <views:PlaceholderView />
+            <views:ArchiveView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ItServiceViewModel}">
             <views:PlaceholderView />
@@ -39,10 +36,9 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Навигационный сайдбар -->
         <Border Grid.Column="0" Background="{StaticResource Brush.Sidebar.Background}">
             <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Margin="20,24,20,24">
+                <StackPanel DockPanel.Dock="Top" Margin="20,24,20,12">
                     <TextBlock Text="МКУ АХУ БМР"
                                Foreground="{StaticResource Brush.Sidebar.Foreground}"
                                FontSize="18" FontWeight="Bold" />
@@ -51,11 +47,34 @@
                                FontSize="12" Margin="0,4,0,0" />
                 </StackPanel>
 
+                <Border DockPanel.Dock="Top"
+                        Background="#16202F"
+                        Margin="12,0,12,12"
+                        Padding="12,8"
+                        CornerRadius="4">
+                    <StackPanel>
+                        <TextBlock Text="{Binding CurrentUserDisplayName}"
+                                   Foreground="{StaticResource Brush.Sidebar.Foreground}"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding CurrentUserRoleDisplayName}"
+                                   Foreground="{StaticResource Brush.Sidebar.Accent}"
+                                   FontSize="11" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Button DockPanel.Dock="Bottom"
+                        Style="{StaticResource NavButton}"
+                        Content="Выйти"
+                        Margin="0,8,0,8"
+                        Command="{Binding LogoutCommand}" />
+
                 <ItemsControl ItemsSource="{Binding NavigationItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource NavButton}"
                                     Content="{Binding Title}"
+                                    Visibility="{Binding IsAllowed, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Command="{Binding DataContext.NavigateToCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding}" />
                         </DataTemplate>
@@ -64,7 +83,6 @@
             </DockPanel>
         </Border>
 
-        <!-- Контентная область -->
         <Border Grid.Column="1" Background="{StaticResource Brush.Content.Background}">
             <ContentControl Content="{Binding CurrentViewModel}" />
         </Border>

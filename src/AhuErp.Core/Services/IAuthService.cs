@@ -1,0 +1,27 @@
+using AhuErp.Core.Models;
+
+namespace AhuErp.Core.Services
+{
+    /// <summary>
+    /// Сервис аутентификации и хранения текущего активного пользователя сессии.
+    /// </summary>
+    public interface IAuthService
+    {
+        /// <summary>
+        /// Текущий вошедший сотрудник или <c>null</c>, если сессия не активна.
+        /// </summary>
+        Employee CurrentEmployee { get; }
+
+        bool IsAuthenticated { get; }
+
+        /// <summary>
+        /// Пытается войти под указанным ФИО / паролем. Возвращает <c>true</c>
+        /// при успехе — при этом обновляется <see cref="CurrentEmployee"/>.
+        /// При неверных данных пользователь остаётся не аутентифицирован.
+        /// </summary>
+        bool TryLogin(string fullName, string password);
+
+        /// <summary>Закрывает текущую сессию.</summary>
+        void Logout();
+    }
+}
