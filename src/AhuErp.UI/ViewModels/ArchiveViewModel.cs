@@ -28,6 +28,7 @@ namespace AhuErp.UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
         [NotifyCanExecuteChangedFor(nameof(CompleteCommand))]
+        [NotifyCanExecuteChangedFor(nameof(GenerateCertificateCommand))]
         private ArchiveRequest selectedRequest;
 
         [ObservableProperty]

@@ -121,44 +121,27 @@ namespace AhuErp.UI.ViewModels
 
             var statusGroups = allDocuments
                 .GroupBy(d => d.Status)
-                .Select(g => new { Status = g.Key, Count = g.Count() })
-                .OrderBy(x => x.Status)
-                .ToList();
+                .Select(g => new StatusSlice(g.Key.ToString(), g.Count()))
+                .OrderBy(x => x.Label, StringComparer.Ordinal)
+                .ToArray();
 
             var categoryGroups = items
                 .GroupBy(i => i.Category)
-                .Select(g => new { Category = g.Key, Count = g.Sum(i => i.TotalQuantity) })
-                .OrderBy(x => x.Category)
-                .ToList();
-
-            var pie = new SeriesCollection();
-            foreach (var group in statusGroups)
-            {
-                pie.Add(new PieSeries
-                {
-                    Title = group.Status.ToString(),
-                    Values = new ChartValues<int> { group.Count },
-                    DataLabels = true,
-                    LabelPoint = p => $"{p.SeriesView.Title}: {p.Y}"
-                });
-            }
-
-            var bar = new SeriesCollection
-            {
-                new ColumnSeries
-                {
-                    Title = "Остаток, шт.",
-                    Values = new ChartValues<int>(categoryGroups.Select(c => c.Count)),
-                    DataLabels = true
-                }
-            };
-            var categoryLabels = categoryGroups.Select(c => c.Category.ToString()).ToArray();
+                .Select(g => new CategorySlice(g.Key.ToString(), g.Sum(i => i.TotalQuantity)))
+                .OrderBy(x => x.Label, StringComparer.Ordinal)
+                .ToArray();
 
             return new DashboardSnapshot(
                 overdueAll, dueSoon, onMission, overdueArchive, lowStock,
-                pie, bar, categoryLabels);
+                statusGroups, categoryGroups);
         }
 
+        /// <summary>
+        /// Применяет данные на UI-потоке. Принципиально: <see cref="PieSeries"/> и
+        /// <see cref="ColumnSeries"/> наследуются от <c>FrameworkElement</c> и
+        /// должны создаваться только из UI-диспетчера — поэтому мы строим их здесь,
+        /// а не в <see cref="ComputeSnapshot"/>, который выполняется в пуле потоков.
+        /// </summary>
         private void ApplySnapshot(DashboardSnapshot s)
         {
             OverdueCount = s.Overdue;
@@ -166,9 +149,44 @@ namespace AhuErp.UI.ViewModels
             ActiveVehicles = s.ActiveVehicles;
             OverdueArchiveRequests = s.OverdueArchiveRequests;
             LowStockItems = s.LowStockItems;
-            DocumentStatusSeries = s.DocumentStatusSeries;
-            InventoryByCategorySeries = s.InventoryByCategorySeries;
-            InventoryCategoryLabels = s.InventoryCategoryLabels;
+
+            var pie = new SeriesCollection();
+            foreach (var slice in s.StatusGroups)
+            {
+                pie.Add(new PieSeries
+                {
+                    Title = slice.Label,
+                    Values = new ChartValues<int> { slice.Count },
+                    DataLabels = true,
+                    LabelPoint = p => $"{p.SeriesView.Title}: {p.Y}"
+                });
+            }
+            DocumentStatusSeries = pie;
+
+            InventoryByCategorySeries = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Title = "Остаток, шт.",
+                    Values = new ChartValues<int>(s.CategoryGroups.Select(c => c.Count)),
+                    DataLabels = true
+                }
+            };
+            InventoryCategoryLabels = s.CategoryGroups.Select(c => c.Label).ToArray();
+        }
+
+        private readonly struct StatusSlice
+        {
+            public string Label { get; }
+            public int Count { get; }
+            public StatusSlice(string label, int count) { Label = label; Count = count; }
+        }
+
+        private readonly struct CategorySlice
+        {
+            public string Label { get; }
+            public int Count { get; }
+            public CategorySlice(string label, int count) { Label = label; Count = count; }
         }
 
         private sealed class DashboardSnapshot
@@ -178,23 +196,20 @@ namespace AhuErp.UI.ViewModels
             public int ActiveVehicles { get; }
             public int OverdueArchiveRequests { get; }
             public int LowStockItems { get; }
-            public SeriesCollection DocumentStatusSeries { get; }
-            public SeriesCollection InventoryByCategorySeries { get; }
-            public string[] InventoryCategoryLabels { get; }
+            public StatusSlice[] StatusGroups { get; }
+            public CategorySlice[] CategoryGroups { get; }
 
             public DashboardSnapshot(int overdue, int dueSoon, int active,
                                      int overdueArchive, int lowStock,
-                                     SeriesCollection pie, SeriesCollection bar,
-                                     string[] labels)
+                                     StatusSlice[] status, CategorySlice[] category)
             {
                 Overdue = overdue;
                 DueSoon = dueSoon;
                 ActiveVehicles = active;
                 OverdueArchiveRequests = overdueArchive;
                 LowStockItems = lowStock;
-                DocumentStatusSeries = pie;
-                InventoryByCategorySeries = bar;
-                InventoryCategoryLabels = labels;
+                StatusGroups = status;
+                CategoryGroups = category;
             }
         }
     }
