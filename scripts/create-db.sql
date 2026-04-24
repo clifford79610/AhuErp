@@ -183,12 +183,13 @@ GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Employees)
 BEGIN
+    -- Role: Admin=0, Manager=1, Archivist=2, TechSupport=3, WarehouseManager=4
     INSERT INTO dbo.Employees (FullName, [Position], [Role], PasswordHash) VALUES
-        (N'Администратор',        N'Админ',             3, NULL),
-        (N'Менеджер Иванов',      N'Менеджер',          2, NULL),
-        (N'Архивариус Петров',    N'Архивариус',        1, NULL),
+        (N'Администратор',        N'Админ',             0, NULL),
+        (N'Менеджер Иванов',      N'Менеджер',          1, NULL),
+        (N'Архивариус Петров',    N'Архивариус',        2, NULL),
         (N'Кладовщик Сидоров',    N'Кладовщик',         4, NULL),
-        (N'IT-специалист Козлов', N'Сисадмин',          5, NULL);
+        (N'IT-специалист Козлов', N'Сисадмин',          3, NULL);
 END
 GO
 
