@@ -125,7 +125,10 @@ namespace AhuErp.UI.ViewModels
             {
                 var user = _auth.CurrentEmployee
                     ?? throw new InvalidOperationException("Пользователь не аутентифицирован.");
-                int? docId = requireDocument ? SelectedDocument?.Id : SelectedDocument?.Id;
+                // Приход (requireDocument=false) НЕ должен привязываться к документу,
+                // даже если пользователь случайно выбрал документ в ComboBox — иначе
+                // в InventoryTransaction.DocumentId окажется чужой Id и аудит-след сломается.
+                int? docId = requireDocument ? SelectedDocument?.Id : null;
                 _inventoryService.ProcessTransaction(SelectedItem.Id, change, docId, user.Id);
                 StatusMessage = successText;
                 Reload();
