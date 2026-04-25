@@ -30,6 +30,11 @@ namespace AhuErp.UI
             var loginVm = AppServices.GetRequiredService<LoginViewModel>();
             var login = new LoginWindow(loginVm);
 
+            // ShutdownMode=OnExplicitShutdown в App.xaml: WPF не закрывает приложение
+            // сам, когда `Application.Windows` ненадолго становится пустым между
+            // закрытием LoginWindow и показом MainWindow. Иначе диспетчер успевает
+            // запланировать shutdown до того, как MainWindow создастся, и процесс
+            // выходит с кодом 0 без видимой ошибки. Закрытие выполняем явно ниже.
             if (login.ShowDialog() != true)
             {
                 Shutdown();
@@ -39,6 +44,7 @@ namespace AhuErp.UI
             var mainVm = AppServices.GetRequiredService<MainViewModel>();
             var main = new MainWindow { DataContext = mainVm };
             MainWindow = main;
+            main.Closed += (_, __) => Shutdown();
             main.Show();
         }
 
