@@ -1,4 +1,5 @@
 using System;
+using AhuErp.Core.Data;
 using AhuErp.Core.Services;
 using AhuErp.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +9,8 @@ namespace AhuErp.UI.Infrastructure
     /// <summary>
     /// Корневой композишн-рут. Регистрирует сервисы и ViewModel-ы в DI-контейнере
     /// и даёт к нему статический доступ из App.xaml.cs (строго как единый entry-point).
+    /// Phase 6: репозитории работают через EF6 (<see cref="AhuDbContext"/>) поверх
+    /// SQL Server, схема создаётся скриптом <c>scripts/create-db.sql</c>.
     /// </summary>
     public static class AppServices
     {
@@ -25,15 +28,11 @@ namespace AhuErp.UI.Infrastructure
             ConfigureServices(services);
             _provider = services.BuildServiceProvider();
 
-            // Демо-данные помещаем в уже существующие in-memory репозитории.
-            var employees = (InMemoryEmployeeRepository)_provider.GetRequiredService<IEmployeeRepository>();
-            var documents = (InMemoryDocumentRepository)_provider.GetRequiredService<IDocumentRepository>();
-            var inventory = (InMemoryInventoryRepository)_provider.GetRequiredService<IInventoryRepository>();
-            var vehicles = (InMemoryVehicleRepository)_provider.GetRequiredService<IVehicleRepository>();
+            // Минимальный сидинг — только администратор, чтобы можно было войти при
+            // пустой БД (схема накатывается извне через scripts/create-db.sql).
+            var ctx = _provider.GetRequiredService<AhuDbContext>();
             var hasher = _provider.GetRequiredService<IPasswordHasher>();
-            DemoDataSeeder.Seed(employees, documents, hasher);
-            DemoDataSeeder.SeedInventory(inventory);
-            DemoDataSeeder.SeedFleet(vehicles, documents);
+            EfDataSeeder.EnsureSeeded(ctx, hasher);
         }
 
         public static T GetRequiredService<T>() where T : class =>
@@ -41,15 +40,22 @@ namespace AhuErp.UI.Infrastructure
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            // Core services
+            // EF6 контекст — singleton: WPF-приложение однопользовательское, обращения
+            // идут с UI-потока (фоновые задачи делают снимок коллекций до Task.Run,
+            // см. DashboardViewModel). Контекст-как-singleton избавляет от ручного
+            // attach/detach при последовательных операциях над одной сущностью.
+            services.AddSingleton<AhuDbContext>(sp => new AhuDbContext());
+
+            // Core services — все репозитории теперь EF6, реализации In-Memory
+            // остаются в кодовой базе для тестов (используются напрямую, не через DI).
             services.AddSingleton<IPasswordHasher>(new Pbkdf2PasswordHasher(iterations: 10_000));
-            services.AddSingleton<IEmployeeRepository>(new InMemoryEmployeeRepository());
-            services.AddSingleton<IDocumentRepository>(new InMemoryDocumentRepository());
+            services.AddSingleton<IEmployeeRepository, EfEmployeeRepository>();
+            services.AddSingleton<IDocumentRepository, EfDocumentRepository>();
             services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<ArchiveService>();
-            services.AddSingleton<IInventoryRepository>(new InMemoryInventoryRepository());
+            services.AddSingleton<IInventoryRepository, EfInventoryRepository>();
             services.AddSingleton<IInventoryService, InventoryService>();
-            services.AddSingleton<IVehicleRepository>(new InMemoryVehicleRepository());
+            services.AddSingleton<IVehicleRepository, EfVehicleRepository>();
             services.AddSingleton<IFleetService>(sp => new FleetService(sp.GetRequiredService<IVehicleRepository>()));
             services.AddSingleton<IReportService, ReportService>();
 

@@ -10,6 +10,15 @@ namespace AhuErp.Core.Data
     /// </summary>
     public class AhuDbContext : DbContext
     {
+        static AhuDbContext()
+        {
+            // Схема создаётся внешним скриптом scripts/create-db.sql, поэтому отключаем
+            // встроенные инициализаторы EF6 (CreateDatabaseIfNotExists / DropCreate*),
+            // чтобы не плодить параллельный механизм миграций и не падать на пустой
+            // _MigrationHistory при первом подключении.
+            Database.SetInitializer<AhuDbContext>(null);
+        }
+
         public AhuDbContext()
             : base("name=AhuErpDb")
         {

@@ -70,6 +70,39 @@ WPF-приложение рассчитано на Windows (net48). На Windows
 dotnet run --project src\AhuErp.UI\AhuErp.UI.csproj
 ```
 
+### Логин по умолчанию (Phase 6, EF6-бэкенд)
+
+При первом запуске на чистой БД `EfDataSeeder` создаёт одного администратора:
+
+| Поле        | Значение                  |
+|-------------|---------------------------|
+| ФИО         | `Иванов Иван Иванович`    |
+| Пароль      | `password`                |
+| Роль        | `Admin`                   |
+
+Если в БД уже есть строки в `Employees` (например, был раскомментирован сид-блок
+в `scripts/create-db.sql`), но ни у кого нет `PasswordHash` — сидер обновит
+существующего «Иванов Иван Иванович» (или создаст нового), чтобы вход был возможен.
+
+## Phase 6: переключение DI с in-memory на EF6
+
+Начиная с Phase 6 все четыре репозитория зарегистрированы как EF6-реализации
+поверх `AhuDbContext` (`EfDocumentRepository`, `EfEmployeeRepository`,
+`EfInventoryRepository`, `EfVehicleRepository`). Контекст — singleton, обращения
+с UI-потока, тесты остаются на in-memory (быстрые, без SQL Server).
+
+Шаги для запуска на своей машине:
+
+1. Установить SQL Server Express (или подключить LocalDB / удалённый сервер).
+2. Накатить схему скриптом `scripts/create-db.sql` (SSMS → File → Open → F5).
+3. Поправить `src/AhuErp.UI/App.config` под свой инстанс, например:
+   ```xml
+   <add name="AhuErpDb"
+        providerName="System.Data.SqlClient"
+        connectionString="Server=DESKTOP-PC\SQLEXPRESS;Database=AhuErpDb;Integrated Security=true;MultipleActiveResultSets=True;" />
+   ```
+4. Собрать и запустить (`Set as Startup Project = AhuErp.UI`, F5).
+
 ## Применение EF6 миграции к SQL Server
 
 Миграция `20260423121238_InitialCreate` разворачивает полную схему первой фазы.
