@@ -36,7 +36,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="40" />
                     <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*" />
-                    <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="140" />
+                    <DataGridTextColumn Header="Категория" Binding="{Binding Category, Converter={StaticResource EnumDisplayConverter}}" Width="140" />
                     <DataGridTextColumn Header="Остаток" Binding="{Binding TotalQuantity}" Width="100" />
                 </DataGrid.Columns>
             </DataGrid>

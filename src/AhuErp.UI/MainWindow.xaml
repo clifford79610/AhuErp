@@ -7,7 +7,7 @@
         xmlns:views="clr-namespace:AhuErp.UI.Views"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="АХУ ERP/EDMS — МКУ АХУ БМР"
+        Title="МКУ АХУ БМР — учёт и документооборот"
         Height="720" Width="1200"
         MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen">
@@ -41,14 +41,29 @@
 
         <Border Grid.Column="0" Background="{StaticResource Brush.Sidebar.Background}">
             <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Margin="20,24,20,12">
-                    <TextBlock Text="МКУ АХУ БМР"
-                               Foreground="{StaticResource Brush.Sidebar.Foreground}"
-                               FontSize="18" FontWeight="Bold" />
-                    <TextBlock Text="ERP / EDMS"
-                               Foreground="{StaticResource Brush.Sidebar.Accent}"
-                               FontSize="12" Margin="0,4,0,0" />
-                </StackPanel>
+                <Grid DockPanel.Dock="Top" Margin="20,24,20,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Source="/AhuErp.UI;component/Assets/balashov-coa.png"
+                           Width="44" Height="56"
+                           Stretch="Uniform"
+                           VerticalAlignment="Top"
+                           Margin="0,0,12,0"
+                           ToolTip="Герб города Балашов" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="МКУ АХУ БМР"
+                                   Foreground="{StaticResource Brush.Sidebar.Foreground}"
+                                   FontSize="18" FontWeight="Bold"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="Учёт и документооборот"
+                                   Foreground="{StaticResource Brush.Sidebar.Accent}"
+                                   FontSize="12" Margin="0,4,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
 
                 <Border DockPanel.Dock="Top"
                         Background="#16202F"

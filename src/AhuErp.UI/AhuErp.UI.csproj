@@ -24,4 +24,8 @@
     <ProjectReference Include="..\AhuErp.Core\AhuErp.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Assets\balashov-coa.png" />
+  </ItemGroup>
+
 </Project>

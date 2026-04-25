@@ -34,11 +34,11 @@
             </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="40" />
-                <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="120" />
+                <DataGridTextColumn Header="Тип" Binding="{Binding Type, Converter={StaticResource EnumDisplayConverter}}" Width="120" />
                 <DataGridTextColumn Header="Тема" Binding="{Binding Title}" Width="*" />
                 <DataGridTextColumn Header="Создан" Binding="{Binding CreationDate, StringFormat=dd.MM.yyyy}" Width="100" />
                 <DataGridTextColumn Header="Срок" Binding="{Binding Deadline, StringFormat=dd.MM.yyyy}" Width="100" />
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="120" />
+                <DataGridTextColumn Header="Статус" Binding="{Binding Status, Converter={StaticResource EnumDisplayConverter}}" Width="120" />
             </DataGrid.Columns>
         </DataGrid>
 
@@ -67,10 +67,12 @@
                 <ComboBox Grid.Row="1" Grid.Column="1"
                           ItemsSource="{Binding EditableTypes}"
                           SelectedItem="{Binding DraftType, UpdateSourceTrigger=PropertyChanged}"
+                          ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
                           Margin="12,0,0,0" Padding="6" />
                 <ComboBox Grid.Row="1" Grid.Column="2"
                           ItemsSource="{Binding Statuses}"
                           SelectedItem="{Binding DraftStatus, UpdateSourceTrigger=PropertyChanged}"
+                          ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
                           Margin="12,0,0,0" Padding="6" />
                 <DatePicker Grid.Row="1" Grid.Column="3"
                             SelectedDate="{Binding DraftDeadline, UpdateSourceTrigger=PropertyChanged}"

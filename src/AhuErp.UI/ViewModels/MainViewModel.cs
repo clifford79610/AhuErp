@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using AhuErp.Core.Services;
+using AhuErp.UI.Converters;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -97,7 +98,7 @@ namespace AhuErp.UI.ViewModels
             }
 
             CurrentUserDisplayName = employee.FullName;
-            CurrentUserRoleDisplayName = employee.Role.ToString();
+            CurrentUserRoleDisplayName = EnumDisplayConverter.Translate(employee.Role);
         }
     }
 }

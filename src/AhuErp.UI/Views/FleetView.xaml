@@ -38,7 +38,7 @@
                         <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="40" />
                         <DataGridTextColumn Header="Госномер" Binding="{Binding LicensePlate}" Width="110" />
                         <DataGridTextColumn Header="Модель" Binding="{Binding Model}" Width="*" />
-                        <DataGridTextColumn Header="Статус" Binding="{Binding CurrentStatus}" Width="120" />
+                        <DataGridTextColumn Header="Статус" Binding="{Binding CurrentStatus, Converter={StaticResource EnumDisplayConverter}}" Width="120" />
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AhuErp.Core.Models;
 using AhuErp.Core.Services;
+using AhuErp.UI.Converters;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LiveCharts;
@@ -140,14 +141,14 @@ namespace AhuErp.UI.ViewModels
 
             var statusGroups = allDocuments
                 .GroupBy(d => d.Status)
-                .Select(g => new StatusSlice(g.Key.ToString(), g.Count()))
-                .OrderBy(x => x.Label, StringComparer.Ordinal)
+                .Select(g => new StatusSlice(EnumDisplayConverter.Translate(g.Key), g.Count()))
+                .OrderBy(x => x.Label, StringComparer.CurrentCulture)
                 .ToArray();
 
             var categoryGroups = items
                 .GroupBy(i => i.Category)
-                .Select(g => new CategorySlice(g.Key.ToString(), g.Sum(i => i.TotalQuantity)))
-                .OrderBy(x => x.Label, StringComparer.Ordinal)
+                .Select(g => new CategorySlice(EnumDisplayConverter.Translate(g.Key), g.Sum(i => i.TotalQuantity)))
+                .OrderBy(x => x.Label, StringComparer.CurrentCulture)
                 .ToArray();
 
             return new DashboardSnapshot(

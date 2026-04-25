@@ -8,6 +8,14 @@
             <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <conv:StringToVisibilityConverter  x:Key="StringToVisibilityConverter" />
             <conv:OverdueRowColorConverter     x:Key="OverdueRowColorConverter" />
+            <conv:EnumDisplayConverter         x:Key="EnumDisplayConverter" />
+
+            <!-- Шаблон элемента ComboBox, отображающий enum через локализующий конвертер.
+                 Используется через ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
+                 у любого ComboBox, где ItemsSource — массив enum-значений. -->
+            <DataTemplate x:Key="EnumComboBoxItemTemplate">
+                <TextBlock Text="{Binding Converter={StaticResource EnumDisplayConverter}}" />
+            </DataTemplate>
 
             <SolidColorBrush x:Key="Brush.Sidebar.Background" Color="#1F2A3A" />
             <SolidColorBrush x:Key="Brush.Sidebar.Foreground" Color="#E6ECF2" />
