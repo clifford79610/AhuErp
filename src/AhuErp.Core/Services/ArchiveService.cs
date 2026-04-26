@@ -9,7 +9,11 @@ namespace AhuErp.Core.Services
     /// </summary>
     public class ArchiveService : IArchiveService
     {
-        public ArchiveRequest CreateRequest(string title, DateTime creationDate, int? assignedEmployeeId = null)
+        public ArchiveRequest CreateRequest(
+            string title,
+            DateTime creationDate,
+            int? assignedEmployeeId = null,
+            ArchiveRequestKind requestKind = ArchiveRequestKind.SocialLegal)
         {
             if (string.IsNullOrWhiteSpace(title))
             {
@@ -20,7 +24,8 @@ namespace AhuErp.Core.Services
             {
                 Title = title,
                 Status = DocumentStatus.New,
-                AssignedEmployeeId = assignedEmployeeId
+                AssignedEmployeeId = assignedEmployeeId,
+                RequestKind = requestKind
             };
             request.InitializeDeadline(creationDate);
             return request;
@@ -32,7 +37,7 @@ namespace AhuErp.Core.Services
             if (!request.CanCompleteRequest())
             {
                 throw new InvalidOperationException(
-                    "Архивный запрос не может быть закрыт: требуются скан-копии паспорта и трудовой книжки.");
+                    "Социально-правовой архивный запрос не может быть закрыт: требуются скан-копии паспорта и трудовой книжки.");
             }
 
             request.Status = DocumentStatus.Completed;

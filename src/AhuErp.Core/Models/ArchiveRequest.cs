@@ -3,32 +3,40 @@ using System;
 namespace AhuErp.Core.Models
 {
     /// <summary>
-    /// Архивная справка. Регламентный срок исполнения — 30 дней с момента регистрации.
-    /// Закрывается только при наличии скан-копий паспорта и трудовой книжки.
+    /// Архивный запрос на выдачу справки, выписки или копии документов.
     /// </summary>
     public class ArchiveRequest : Document
     {
         /// <summary>
-        /// Регламентный срок обработки архивного запроса (в календарных днях).
+        /// Регламентный срок выдачи архивных справок и выписок (в рабочих днях).
         /// </summary>
         public const int DefaultDeadlineDays = 30;
+
+        /// <summary>
+        /// Регламентный срок выдачи копий муниципальных правовых актов (в рабочих днях).
+        /// </summary>
+        public const int MunicipalLegalActCopyDeadlineDays = 15;
+
+        /// <summary>
+        /// Срок перенаправления непрофильного заявления в другой архив или организацию.
+        /// </summary>
+        public const int RedirectDeadlineDays = 7;
 
         public bool HasPassportScan { get; set; }
 
         public bool HasWorkBookScan { get; set; }
+
+        public ArchiveRequestKind RequestKind { get; set; } = ArchiveRequestKind.SocialLegal;
 
         public ArchiveRequest()
         {
             Type = DocumentType.Archive;
         }
 
-        /// <summary>
-        /// Устанавливает регламентный срок исполнения: <paramref name="creationDate"/> + 30 дней.
-        /// </summary>
         public void InitializeDeadline(DateTime creationDate)
         {
             CreationDate = creationDate;
-            Deadline = creationDate.AddDays(DefaultDeadlineDays);
+            Deadline = creationDate.AddDays(GetDeadlineDays(RequestKind));
         }
 
         /// <summary>
@@ -36,7 +44,19 @@ namespace AhuErp.Core.Models
         /// </summary>
         public bool CanCompleteRequest()
         {
-            return HasPassportScan && HasWorkBookScan;
+            if (RequestKind == ArchiveRequestKind.SocialLegal)
+            {
+                return HasPassportScan && HasWorkBookScan;
+            }
+
+            return true;
+        }
+
+        private static int GetDeadlineDays(ArchiveRequestKind kind)
+        {
+            return kind == ArchiveRequestKind.MunicipalLegalActCopy
+                ? MunicipalLegalActCopyDeadlineDays
+                : DefaultDeadlineDays;
         }
     }
 }

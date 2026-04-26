@@ -20,6 +20,21 @@ namespace AhuErp.Tests
             Assert.Equal(created.AddDays(30), request.Deadline);
             Assert.Equal(DocumentStatus.New, request.Status);
             Assert.Equal(DocumentType.Archive, request.Type);
+            Assert.Equal(ArchiveRequestKind.SocialLegal, request.RequestKind);
+        }
+
+        [Fact]
+        public void CreateRequest_sets_15_day_deadline_for_municipal_legal_act_copies()
+        {
+            var created = new DateTime(2026, 4, 23, 12, 0, 0);
+
+            var request = _service.CreateRequest(
+                "Копия постановления администрации БМР",
+                created,
+                requestKind: ArchiveRequestKind.MunicipalLegalActCopy);
+
+            Assert.Equal(created.AddDays(ArchiveRequest.MunicipalLegalActCopyDeadlineDays), request.Deadline);
+            Assert.Equal(ArchiveRequestKind.MunicipalLegalActCopy, request.RequestKind);
         }
 
         [Fact]
@@ -58,6 +73,17 @@ namespace AhuErp.Tests
             var request = _service.CreateRequest("A", DateTime.UtcNow);
             request.HasPassportScan = true;
             request.HasWorkBookScan = true;
+            Assert.True(request.CanCompleteRequest());
+        }
+
+        [Fact]
+        public void CanCompleteRequest_allows_thematic_requests_without_personnel_scans()
+        {
+            var request = _service.CreateRequest(
+                "Тематический запрос о выделении земельного участка",
+                DateTime.UtcNow,
+                requestKind: ArchiveRequestKind.Thematic);
+
             Assert.True(request.CanCompleteRequest());
         }
 

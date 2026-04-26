@@ -43,11 +43,11 @@ namespace AhuErp.UI.ViewModels
             NavigationItems = new ObservableCollection<NavigationItem>
             {
                 new NavigationItem("Дашборд",    RolePolicy.Dashboard, dashboardVm),
-                new NavigationItem("Канцелярия", RolePolicy.Office,    officeVm),
-                new NavigationItem("Архив",      RolePolicy.Archive,   archiveVm),
+                new NavigationItem("Документационное обеспечение", RolePolicy.Office,    officeVm),
+                new NavigationItem("Архивный отдел", RolePolicy.Archive, archiveVm),
                 new NavigationItem("Склад / ТМЦ", RolePolicy.Warehouse, warehouseVm),
-                new NavigationItem("IT-служба",  RolePolicy.ItService, itServiceVm),
-                new NavigationItem("Автопарк",   RolePolicy.Fleet,     fleetVm),
+                new NavigationItem("ИТО",        RolePolicy.ItService, itServiceVm),
+                new NavigationItem("Транспорт",  RolePolicy.Fleet,     fleetVm),
             };
 
             ApplyRolePolicy();

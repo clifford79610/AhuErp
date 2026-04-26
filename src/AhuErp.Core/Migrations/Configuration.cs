@@ -19,8 +19,7 @@ namespace AhuErp.Core.Migrations
 
         protected override void Seed(AhuDbContext context)
         {
-            // Начальное наполнение справочников при первой миграции.
-            // Реальные seed-данные появятся на следующих фазах.
+            // Справочники представлены enum-ами; реальные записи заводятся через UI.
         }
     }
 }

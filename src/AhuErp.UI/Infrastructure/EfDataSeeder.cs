@@ -17,7 +17,7 @@ namespace AhuErp.UI.Infrastructure
     public static class EfDataSeeder
     {
         public const string DefaultPassword = "password";
-        public const string AdminFullName = "Иванов Иван Иванович";
+        public const string AdminFullName = "Администратор МКУ АХУ БМР";
 
         public static void EnsureSeeded(AhuDbContext ctx, IPasswordHasher hasher)
         {
@@ -45,7 +45,7 @@ namespace AhuErp.UI.Infrastructure
             ctx.Employees.Add(new Employee
             {
                 FullName = AdminFullName,
-                Position = "Администратор",
+                Position = "Администратор информационной системы",
                 Role = EmployeeRole.Admin,
                 PasswordHash = hasher.Hash(DefaultPassword)
             });

@@ -14,7 +14,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="IT-служба (Help Desk)"
+        <TextBlock Text="Служба по информационно-техническому обеспечению"
                    FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16" />
 
         <DataGrid Grid.Row="1"

@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 namespace AhuErp.UI.ViewModels
 {
     /// <summary>
-    /// ViewModel раздела «Канцелярия» — простая CRUD-оболочка над
+    /// ViewModel раздела «Отдел документационного обеспечения» — простая CRUD-оболочка над
     /// <see cref="IDocumentRepository"/> для входящих и внутренних документов.
     /// </summary>
     public partial class OfficeViewModel : ViewModelBase

@@ -21,8 +21,8 @@ namespace AhuErp.Tests
 
             _repo.AddVehicle(new Vehicle
             {
-                Model = "Ford Focus",
-                LicensePlate = "А001АА",
+                Model = "Lada Largus",
+                LicensePlate = "А123БВ 64",
                 CurrentStatus = VehicleStatus.Available
             });
         }
@@ -35,19 +35,19 @@ namespace AhuErp.Tests
                 documentId: 10,
                 startDate: new DateTime(2026, 5, 1, 9, 0, 0),
                 endDate: new DateTime(2026, 5, 1, 12, 0, 0),
-                driverName: "Иванов И.И.");
+                driverName: "Стерликов Д.Н.");
 
             var second = _service.BookVehicle(
                 vehicleId: 1,
                 documentId: 11,
                 startDate: new DateTime(2026, 5, 1, 13, 0, 0),
                 endDate: new DateTime(2026, 5, 1, 17, 0, 0),
-                driverName: "Петров П.П.");
+                driverName: "Дорофеев А.В.");
 
             Assert.NotNull(first);
             Assert.NotNull(second);
             Assert.Equal(2, _repo.ListTrips(1).Count);
-            Assert.Equal("Иванов И.И.", first.DriverName);
+            Assert.Equal("Стерликов Д.Н.", first.DriverName);
             Assert.Equal(10, first.DocumentId);
         }
 
@@ -57,13 +57,13 @@ namespace AhuErp.Tests
             _service.BookVehicle(1, 10,
                 new DateTime(2026, 5, 1, 9, 0, 0),
                 new DateTime(2026, 5, 1, 12, 0, 0),
-                "Иванов И.И.");
+                "Стерликов Д.Н.");
 
             var ex = Assert.Throws<VehicleBookingException>(() =>
                 _service.BookVehicle(1, 11,
                     new DateTime(2026, 5, 1, 9, 0, 0),
                     new DateTime(2026, 5, 1, 12, 0, 0),
-                    "Петров П.П."));
+                    "Дорофеев А.В."));
 
             Assert.Contains("уже забронирован", ex.Message);
             Assert.Single(_repo.ListTrips(1));
@@ -75,13 +75,13 @@ namespace AhuErp.Tests
             _service.BookVehicle(1, 10,
                 new DateTime(2026, 5, 1, 10, 0, 0),
                 new DateTime(2026, 5, 1, 14, 0, 0),
-                "Иванов И.И.");
+                "Стерликов Д.Н.");
 
             Assert.Throws<VehicleBookingException>(() =>
                 _service.BookVehicle(1, 11,
                     new DateTime(2026, 5, 1, 9, 0, 0),
                     new DateTime(2026, 5, 1, 11, 0, 0),
-                    "Петров П.П."));
+                    "Дорофеев А.В."));
         }
 
         [Fact]
@@ -90,13 +90,13 @@ namespace AhuErp.Tests
             _service.BookVehicle(1, 10,
                 new DateTime(2026, 5, 1, 10, 0, 0),
                 new DateTime(2026, 5, 1, 14, 0, 0),
-                "Иванов И.И.");
+                "Стерликов Д.Н.");
 
             Assert.Throws<VehicleBookingException>(() =>
                 _service.BookVehicle(1, 11,
                     new DateTime(2026, 5, 1, 13, 0, 0),
                     new DateTime(2026, 5, 1, 16, 0, 0),
-                    "Петров П.П."));
+                    "Дорофеев А.В."));
         }
 
         [Fact]
@@ -105,13 +105,13 @@ namespace AhuErp.Tests
             _service.BookVehicle(1, 10,
                 new DateTime(2026, 5, 1, 9, 0, 0),
                 new DateTime(2026, 5, 1, 18, 0, 0),
-                "Иванов И.И.");
+                "Стерликов Д.Н.");
 
             Assert.Throws<VehicleBookingException>(() =>
                 _service.BookVehicle(1, 11,
                     new DateTime(2026, 5, 1, 12, 0, 0),
                     new DateTime(2026, 5, 1, 14, 0, 0),
-                    "Петров П.П."));
+                    "Дорофеев А.В."));
         }
 
         [Fact]
@@ -120,13 +120,13 @@ namespace AhuErp.Tests
             _service.BookVehicle(1, 10,
                 new DateTime(2026, 5, 1, 9, 0, 0),
                 new DateTime(2026, 5, 1, 12, 0, 0),
-                "Иванов И.И.");
+                "Стерликов Д.Н.");
 
             // Конец предыдущей == начало следующей → intervals [a,b) не пересекаются.
             var next = _service.BookVehicle(1, 11,
                 new DateTime(2026, 5, 1, 12, 0, 0),
                 new DateTime(2026, 5, 1, 15, 0, 0),
-                "Петров П.П.");
+                "Дорофеев А.В.");
 
             Assert.NotNull(next);
             Assert.Equal(2, _repo.ListTrips(1).Count);
@@ -139,7 +139,7 @@ namespace AhuErp.Tests
                 _service.BookVehicle(99, 10,
                     new DateTime(2026, 5, 1, 9, 0, 0),
                     new DateTime(2026, 5, 1, 12, 0, 0),
-                    "Иванов И.И."));
+                    "Стерликов Д.Н."));
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace AhuErp.Tests
                 _service.BookVehicle(1, 10,
                     new DateTime(2026, 5, 1, 9, 0, 0),
                     new DateTime(2026, 5, 1, 12, 0, 0),
-                    "Иванов И.И."));
+                    "Стерликов Д.Н."));
 
             Assert.Contains("обслуживании", ex.Message);
             Assert.Empty(_repo.ListTrips(1));
@@ -175,7 +175,7 @@ namespace AhuErp.Tests
                 _service.BookVehicle(1, 0,
                     new DateTime(2026, 5, 1, 9, 0, 0),
                     new DateTime(2026, 5, 1, 12, 0, 0),
-                    "Иванов И.И."));
+                    "Стерликов Д.Н."));
         }
     }
 }

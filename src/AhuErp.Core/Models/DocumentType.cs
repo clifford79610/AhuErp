@@ -13,10 +13,10 @@ namespace AhuErp.Core.Models
         It = 3,
         Fleet = 4,
 
-        /// <summary>Входящий документ (канцелярия).</summary>
+        /// <summary>Входящий документ отдела документационного обеспечения.</summary>
         Incoming = 5,
 
-        /// <summary>Внутренний документ (канцелярия).</summary>
+        /// <summary>Внутренний документ отдела документационного обеспечения.</summary>
         Internal = 6,
 
         /// <summary>Архивный запрос (используется <see cref="ArchiveRequest"/>).</summary>

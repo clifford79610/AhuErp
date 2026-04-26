@@ -14,7 +14,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Архивные запросы"
+        <TextBlock Text="Архивный отдел — справки, выписки, копии документов"
                    FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16" />
 
         <DataGrid Grid.Row="1"
@@ -34,6 +34,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="40" />
                 <DataGridTextColumn Header="Тема" Binding="{Binding Title}" Width="*" />
+                <DataGridTextColumn Header="Вид запроса" Binding="{Binding RequestKind, Converter={StaticResource EnumDisplayConverter}}" Width="170" />
                 <DataGridTextColumn Header="Создан" Binding="{Binding CreationDate, StringFormat=dd.MM.yyyy}" Width="100" />
                 <DataGridTextColumn Header="Срок" Binding="{Binding Deadline, StringFormat=dd.MM.yyyy}" Width="100" />
                 <DataGridCheckBoxColumn Header="Паспорт" Binding="{Binding HasPassportScan}" Width="80" />
@@ -51,15 +52,22 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="180" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Тема" />
+                <TextBlock Text="Тема запроса" />
+                <TextBlock Grid.Column="1" Text="Вид" Margin="12,0,0,0" />
                 <TextBox Grid.Row="1"
                          Text="{Binding DraftTitle, UpdateSourceTrigger=PropertyChanged}"
                          Padding="6" />
+                <ComboBox Grid.Row="1" Grid.Column="1"
+                          ItemsSource="{Binding RequestKinds}"
+                          SelectedItem="{Binding DraftRequestKind, UpdateSourceTrigger=PropertyChanged}"
+                          ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
+                          Margin="12,0,0,0" Padding="6" />
 
-                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="12,0,0,0">
+                <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Margin="12,0,0,0">
                     <CheckBox Content="Скан паспорта"
                               IsChecked="{Binding DraftHasPassportScan, UpdateSourceTrigger=PropertyChanged}"
                               VerticalAlignment="Center" Margin="0,0,16,0" />
@@ -68,7 +76,7 @@
                               VerticalAlignment="Center" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,12,0,0">
+                <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,0">
                     <Button Content="Новый"     Command="{Binding NewCommand}"                 MinWidth="80"  Padding="8,4" Margin="0,0,6,0" />
                     <Button Content="Сохранить" Command="{Binding SaveCommand}"                MinWidth="90"  Padding="8,4" Margin="0,0,6,0" />
                     <Button Content="Завершить" Command="{Binding CompleteCommand}"            MinWidth="90"  Padding="8,4" Margin="0,0,6,0" />

@@ -24,6 +24,9 @@ namespace AhuErp.UI.ViewModels
 
         public ObservableCollection<ArchiveRequest> Requests { get; }
 
+        public ArchiveRequestKind[] RequestKinds { get; } =
+            (ArchiveRequestKind[])Enum.GetValues(typeof(ArchiveRequestKind));
+
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
@@ -34,6 +37,9 @@ namespace AhuErp.UI.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         private string draftTitle;
+
+        [ObservableProperty]
+        private ArchiveRequestKind draftRequestKind = ArchiveRequestKind.SocialLegal;
 
         [ObservableProperty]
         private bool draftHasPassportScan;
@@ -65,11 +71,13 @@ namespace AhuErp.UI.ViewModels
             if (value == null)
             {
                 DraftTitle = null;
+                DraftRequestKind = ArchiveRequestKind.SocialLegal;
                 DraftHasPassportScan = false;
                 DraftHasWorkBookScan = false;
                 return;
             }
             DraftTitle = value.Title;
+            DraftRequestKind = value.RequestKind;
             DraftHasPassportScan = value.HasPassportScan;
             DraftHasWorkBookScan = value.HasWorkBookScan;
         }
@@ -79,6 +87,7 @@ namespace AhuErp.UI.ViewModels
         {
             SelectedRequest = null;
             DraftTitle = string.Empty;
+            DraftRequestKind = ArchiveRequestKind.SocialLegal;
             DraftHasPassportScan = false;
             DraftHasWorkBookScan = false;
             ErrorMessage = null;
@@ -92,7 +101,10 @@ namespace AhuErp.UI.ViewModels
             {
                 if (SelectedRequest == null)
                 {
-                    var request = _archiveService.CreateRequest(DraftTitle, DateTime.Now);
+                    var request = _archiveService.CreateRequest(
+                        DraftTitle,
+                        DateTime.Now,
+                        requestKind: DraftRequestKind);
                     request.HasPassportScan = DraftHasPassportScan;
                     request.HasWorkBookScan = DraftHasWorkBookScan;
                     _documents.Add(request);
@@ -100,6 +112,8 @@ namespace AhuErp.UI.ViewModels
                 else
                 {
                     SelectedRequest.Title = DraftTitle;
+                    SelectedRequest.RequestKind = DraftRequestKind;
+                    SelectedRequest.InitializeDeadline(SelectedRequest.CreationDate);
                     SelectedRequest.HasPassportScan = DraftHasPassportScan;
                     SelectedRequest.HasWorkBookScan = DraftHasWorkBookScan;
                     _documents.Update(SelectedRequest);

@@ -50,7 +50,7 @@ namespace AhuErp.Core.Services
                 {
                     sheet.Cell(row, 1).Value = item.Id;
                     sheet.Cell(row, 2).Value = item.Name;
-                    sheet.Cell(row, 3).Value = item.Category.ToString();
+                    sheet.Cell(row, 3).Value = FormatCategory(item.Category);
                     sheet.Cell(row, 4).Value = item.TotalQuantity;
                     row++;
                 }
@@ -76,9 +76,15 @@ namespace AhuErp.Core.Services
                 main.Document = new W.Document();
                 var body = main.Document.AppendChild(new W.Body());
 
-                body.AppendChild(Heading("СПРАВКА о стаже"));
+                body.AppendChild(Paragraph(OrganizationProfile.FullName));
+                body.AppendChild(Paragraph(OrganizationProfile.ArchiveDepartmentName));
+                body.AppendChild(Paragraph(OrganizationProfile.ArchiveAddress));
+                body.AppendChild(Paragraph($"Телефон: {OrganizationProfile.ArchivePhone}; e-mail: {OrganizationProfile.ArchiveEmail}"));
+                body.AppendChild(Paragraph(string.Empty));
+                body.AppendChild(Heading("АРХИВНАЯ СПРАВКА"));
                 body.AppendChild(Paragraph($"по архивному запросу №{document.Id} от {document.CreationDate:dd.MM.yyyy}"));
                 body.AppendChild(Paragraph(string.Empty));
+                body.AppendChild(Paragraph($"Вид запроса: {FormatArchiveRequestKind(document.RequestKind)}"));
                 body.AppendChild(Paragraph($"Тема запроса: {document.Title}"));
                 body.AppendChild(Paragraph($"Срок исполнения: {document.Deadline:dd.MM.yyyy}"));
                 body.AppendChild(Paragraph(string.Empty));
@@ -92,8 +98,8 @@ namespace AhuErp.Core.Services
                 if (document.HasPassportScan && document.HasWorkBookScan)
                 {
                     body.AppendChild(Paragraph(
-                        "Настоящим подтверждается, что все необходимые документы представлены " +
-                        "в полном объёме. Архивная справка оформлена и передана заявителю."));
+                        "Настоящим подтверждается, что документы представлены в полном объёме. " +
+                        "Архивная справка, выписка или копия подготовлена для выдачи заявителю."));
                 }
                 else
                 {
@@ -103,10 +109,42 @@ namespace AhuErp.Core.Services
                 }
 
                 body.AppendChild(Paragraph(string.Empty));
-                body.AppendChild(Paragraph("Начальник архивного отдела _________________________"));
+                body.AppendChild(Paragraph($"Начальник архивного отдела _________________________ {OrganizationProfile.ArchiveHeadShortName}"));
                 body.AppendChild(Paragraph($"Дата оформления: {DateTime.Now:dd.MM.yyyy}"));
 
                 main.Document.Save();
+            }
+        }
+
+        private static string FormatArchiveRequestKind(ArchiveRequestKind kind)
+        {
+            switch (kind)
+            {
+                case ArchiveRequestKind.SocialLegal:
+                    return "социально-правовой запрос";
+                case ArchiveRequestKind.Thematic:
+                    return "тематический запрос";
+                case ArchiveRequestKind.MunicipalLegalActCopy:
+                    return "копия муниципального правового акта";
+                case ArchiveRequestKind.PaidThematic:
+                    return "платный тематический запрос";
+                default:
+                    return kind.ToString();
+            }
+        }
+
+        private static string FormatCategory(InventoryCategory category)
+        {
+            switch (category)
+            {
+                case InventoryCategory.Stationery:
+                    return "Канцелярские товары и бланки";
+                case InventoryCategory.IT_Equipment:
+                    return "Оргтехника, расходные материалы и связь";
+                case InventoryCategory.Cleaning_Supplies:
+                    return "Хозяйственные и эксплуатационные материалы";
+                default:
+                    return category.ToString();
             }
         }
 

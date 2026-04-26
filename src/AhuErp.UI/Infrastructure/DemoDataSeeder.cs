@@ -25,40 +25,40 @@ namespace AhuErp.UI.Infrastructure
             var admin = new Employee
             {
                 Id = 1,
-                FullName = "Иванов Иван Иванович",
-                Position = "Администратор",
+                FullName = "Администратор МКУ АХУ БМР",
+                Position = "Администратор информационной системы",
                 Role = EmployeeRole.Admin,
                 PasswordHash = hash
             };
             var manager = new Employee
             {
                 Id = 2,
-                FullName = "Петров Пётр Петрович",
-                Position = "Руководитель АХУ",
+                FullName = "Стерликов Дмитрий Николаевич",
+                Position = "Руководитель службы по информационно-техническому обеспечению",
                 Role = EmployeeRole.Manager,
                 PasswordHash = hash
             };
             var archivist = new Employee
             {
                 Id = 3,
-                FullName = "Сидорова Анна Сергеевна",
-                Position = "Архивариус",
+                FullName = "Бурдина Галина Николаевна",
+                Position = "Начальник архивного отдела",
                 Role = EmployeeRole.Archivist,
                 PasswordHash = hash
             };
             var tech = new Employee
             {
                 Id = 4,
-                FullName = "Кузнецов Алексей Викторович",
-                Position = "Инженер IT",
+                FullName = "Дорофеев Артем Валерьевич",
+                Position = "Специалист-техник по компьютерным сетям и системам",
                 Role = EmployeeRole.TechSupport,
                 PasswordHash = hash
             };
             var warehouse = new Employee
             {
                 Id = 5,
-                FullName = "Орлова Мария Николаевна",
-                Position = "Заведующий хозяйством",
+                FullName = "Зайченко Татьяна Александровна",
+                Position = "Специалист-техник по компьютерным сетям и системам",
                 Role = EmployeeRole.WarehouseManager,
                 PasswordHash = hash
             };
@@ -74,7 +74,7 @@ namespace AhuErp.UI.Infrastructure
             documents.Add(new Document
             {
                 Type = DocumentType.Incoming,
-                Title = "Письмо Министерства от 15.04",
+                Title = "Входящее письмо Правительства Саратовской области",
                 CreationDate = now.AddDays(-10),
                 Deadline = now.AddDays(5),
                 Status = DocumentStatus.InProgress,
@@ -83,7 +83,7 @@ namespace AhuErp.UI.Infrastructure
             documents.Add(new Document
             {
                 Type = DocumentType.Internal,
-                Title = "Распоряжение о субботнике",
+                Title = "Проект распоряжения администрации БМР по делопроизводству",
                 CreationDate = now.AddDays(-3),
                 Deadline = now.AddDays(2),
                 Status = DocumentStatus.New,
@@ -92,10 +92,11 @@ namespace AhuErp.UI.Infrastructure
 
             var archive = new ArchiveRequest
             {
-                Title = "Архивная справка — Сидорова",
+                Title = "Архивная справка о стаже и заработной плате",
                 Status = DocumentStatus.InProgress,
                 HasPassportScan = true,
                 HasWorkBookScan = false,
+                RequestKind = ArchiveRequestKind.SocialLegal,
                 AssignedEmployeeId = archivist.Id
             };
             archive.InitializeDeadline(now.AddDays(-25));
@@ -103,8 +104,8 @@ namespace AhuErp.UI.Infrastructure
 
             documents.Add(new ItTicket
             {
-                Title = "Не печатает принтер HP LaserJet в каб. 214",
-                AffectedEquipment = "HP LaserJet Pro M404",
+                Title = "Профилактика оргтехники в кабинете № 3",
+                AffectedEquipment = "Рабочая станция и принтер, ул. Советская, 178 каб. 3",
                 CreationDate = now.AddDays(-2),
                 Deadline = now.AddDays(3),
                 Status = DocumentStatus.InProgress,
@@ -136,7 +137,7 @@ namespace AhuErp.UI.Infrastructure
             });
             inventory.AddItem(new InventoryItem
             {
-                Name = "Жидкость для мытья полов 5 л",
+                Name = "Средство для уборки помещений 5 л",
                 Category = InventoryCategory.Cleaning_Supplies,
                 TotalQuantity = 8
             });
@@ -150,27 +151,27 @@ namespace AhuErp.UI.Infrastructure
 
             vehicles.AddVehicle(new Vehicle
             {
-                Model = "Ford Focus",
-                LicensePlate = "А001АА 71",
-                CurrentStatus = VehicleStatus.Available
-            });
-            vehicles.AddVehicle(new Vehicle
-            {
                 Model = "Lada Largus",
-                LicensePlate = "В002ВВ 71",
+                LicensePlate = "А123БВ 64",
                 CurrentStatus = VehicleStatus.Available
             });
             vehicles.AddVehicle(new Vehicle
             {
-                Model = "ГАЗ-3302 Газель",
-                LicensePlate = "С003СС 71",
+                Model = "ГАЗель NEXT",
+                LicensePlate = "В777ТТ 64",
+                CurrentStatus = VehicleStatus.Available
+            });
+            vehicles.AddVehicle(new Vehicle
+            {
+                Model = "УАЗ Патриот",
+                LicensePlate = "Е111КХ 64",
                 CurrentStatus = VehicleStatus.Maintenance
             });
 
             var now = DateTime.Now;
             documents.Add(new Document
             {
-                Title = "Заявка на транспорт: выезд в администрацию района",
+                Title = "Заявка на транспорт: Советская, 178 → архивный отдел на ул. Авиаторов",
                 Type = DocumentType.Fleet,
                 CreationDate = now.AddDays(-1),
                 Deadline = now.AddDays(2),
@@ -178,7 +179,7 @@ namespace AhuErp.UI.Infrastructure
             });
             documents.Add(new Document
             {
-                Title = "Заявка на транспорт: доставка канцелярии со склада",
+                Title = "Заявка на транспорт: доставка документов организаций-источников комплектования",
                 Type = DocumentType.Fleet,
                 CreationDate = now,
                 Deadline = now.AddDays(7),

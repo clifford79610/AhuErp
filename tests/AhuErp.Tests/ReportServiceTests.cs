@@ -104,10 +104,11 @@ namespace AhuErp.Tests
                 using (var sr = new StreamReader(docPart.GetStream()))
                 {
                     var xml = sr.ReadToEnd();
-                    Assert.Contains("СПРАВКА о стаже", xml);
+                    Assert.Contains("АРХИВНАЯ СПРАВКА", xml);
                     Assert.Contains($"№{request.Id}", xml);
                     Assert.Contains("01.05.2026", xml);
                     Assert.Contains("Запрос о стаже", xml);
+                    Assert.Contains("Бурдина Г.Н.", xml);
                     Assert.Contains("приложен", xml);
                     Assert.Contains("приложена", xml);
                     Assert.Contains("в полном объёме", xml);

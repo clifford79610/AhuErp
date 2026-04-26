@@ -27,23 +27,28 @@ namespace AhuErp.UI.Converters
             [DocumentStatus.Cancelled] = "Отменён",
 
             [DocumentType.General] = "Общий",
-            [DocumentType.Office] = "Канцелярия",
-            [DocumentType.Archive] = "Архив",
-            [DocumentType.It] = "IT",
-            [DocumentType.Fleet] = "Автопарк",
+            [DocumentType.Office] = "Документационное обеспечение",
+            [DocumentType.Archive] = "Архивный отдел",
+            [DocumentType.It] = "ИТО",
+            [DocumentType.Fleet] = "Транспорт",
             [DocumentType.Incoming] = "Входящий",
             [DocumentType.Internal] = "Внутренний",
             [DocumentType.ArchiveRequest] = "Архивный запрос",
 
-            [InventoryCategory.Stationery] = "Канцтовары",
-            [InventoryCategory.IT_Equipment] = "ИТ-оборудование",
-            [InventoryCategory.Cleaning_Supplies] = "Хозтовары",
+            [ArchiveRequestKind.SocialLegal] = "Социально-правовой запрос",
+            [ArchiveRequestKind.Thematic] = "Тематический запрос",
+            [ArchiveRequestKind.MunicipalLegalActCopy] = "Копия муниципального правового акта",
+            [ArchiveRequestKind.PaidThematic] = "Платный тематический запрос",
+
+            [InventoryCategory.Stationery] = "Канцелярские товары и бланки",
+            [InventoryCategory.IT_Equipment] = "Оргтехника, расходные материалы и связь",
+            [InventoryCategory.Cleaning_Supplies] = "Хозяйственные и эксплуатационные материалы",
 
             [EmployeeRole.Admin] = "Администратор",
-            [EmployeeRole.Manager] = "Руководитель",
-            [EmployeeRole.Archivist] = "Архивариус",
-            [EmployeeRole.TechSupport] = "IT-специалист",
-            [EmployeeRole.WarehouseManager] = "Заведующий складом",
+            [EmployeeRole.Manager] = "Руководитель / начальник службы",
+            [EmployeeRole.Archivist] = "Сотрудник архивного отдела",
+            [EmployeeRole.TechSupport] = "Специалист ИТО",
+            [EmployeeRole.WarehouseManager] = "Ответственный за ТМЦ",
         };
 
         public static string Translate(Enum value) =>

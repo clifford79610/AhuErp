@@ -57,6 +57,7 @@ BEGIN
         AssignedEmployeeId  INT             NULL,
         HasPassportScan     BIT             NULL,
         HasWorkBookScan     BIT             NULL,
+        ArchiveRequestKind  INT             NULL,
         AffectedEquipment   NVARCHAR(256)   NULL,
         ResolutionNotes     NVARCHAR(1024)  NULL,
         DocumentKind        NVARCHAR(128)   NOT NULL,
@@ -185,29 +186,29 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Employees)
 BEGIN
     -- Role: Admin=0, Manager=1, Archivist=2, TechSupport=3, WarehouseManager=4
     INSERT INTO dbo.Employees (FullName, [Position], [Role], PasswordHash) VALUES
-        (N'Администратор',        N'Админ',             0, NULL),
-        (N'Менеджер Иванов',      N'Менеджер',          1, NULL),
-        (N'Архивариус Петров',    N'Архивариус',        2, NULL),
-        (N'Кладовщик Сидоров',    N'Кладовщик',         4, NULL),
-        (N'IT-специалист Козлов', N'Сисадмин',          3, NULL);
+        (N'Администратор МКУ АХУ БМР', N'Администратор информационной системы', 0, NULL),
+        (N'Стерликов Дмитрий Николаевич', N'Руководитель службы по информационно-техническому обеспечению', 1, NULL),
+        (N'Бурдина Галина Николаевна', N'Начальник архивного отдела', 2, NULL),
+        (N'Дорофеев Артем Валерьевич', N'Специалист-техник по компьютерным сетям и системам', 3, NULL),
+        (N'Зайченко Татьяна Александровна', N'Специалист-техник по компьютерным сетям и системам', 4, NULL);
 END
 GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Vehicles)
 BEGIN
     INSERT INTO dbo.Vehicles (Model, LicensePlate, CurrentStatus) VALUES
-        (N'Ford Focus',  N'А123БВ64', 0),
-        (N'Lada Largus', N'В777ТТ64', 0),
-        (N'ГАЗель NEXT', N'Е111КХ64', 1);
+        (N'Lada Largus', N'А123БВ 64', 0),
+        (N'ГАЗель NEXT', N'В777ТТ 64', 0),
+        (N'УАЗ Патриот', N'Е111КХ 64', 1);
 END
 GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.InventoryItems)
 BEGIN
     INSERT INTO dbo.InventoryItems ([Name], Category, TotalQuantity) VALUES
-        (N'Бумага A4',             0, 50),
-        (N'Картридж HP LaserJet',  1,  4),
-        (N'Швабра',                2,  3);
+        (N'Бумага A4 для документооборота', 0, 50),
+        (N'Картридж для оргтехники',        1,  4),
+        (N'Средство для уборки помещений',  2,  3);
 END
 GO
 */

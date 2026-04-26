@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 namespace AhuErp.UI.ViewModels
 {
     /// <summary>
-    /// ViewModel раздела «IT-служба» (Help Desk). Даёт CRUD для <see cref="ItTicket"/>
+    /// ViewModel раздела «Служба по информационно-техническому обеспечению». Даёт CRUD для <see cref="ItTicket"/>
     /// и позволяет при закрытии заявки списать расходник со склада —
     /// списание проходит через <see cref="IInventoryService"/> и привязывается
     /// к <see cref="ItTicket.Id"/> как к документу-основанию.

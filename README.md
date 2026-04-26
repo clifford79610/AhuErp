@@ -29,8 +29,9 @@ AhuErp.sln
 ## Бизнес-логика (Phase 1)
 
 ### Архив
-- `ArchiveService.CreateRequest(...)` создаёт запрос и выставляет `Deadline = CreationDate + 30 дней`.
-- `ArchiveRequest.CanCompleteRequest()` возвращает `true` только при наличии обеих скан-копий (`HasPassportScan && HasWorkBookScan`).
+- `ArchiveService.CreateRequest(...)` создаёт социально-правовой, тематический или платный тематический запрос, либо запрос копии муниципального правового акта.
+- Регламентные сроки МКУ «АХУ» БМР: 30 рабочих дней для справок/выписок, 15 рабочих дней для копий муниципальных правовых актов, 7 рабочих дней на перенаправление непрофильного заявления.
+- `ArchiveRequest.CanCompleteRequest()` требует скан-копии паспорта и трудовой книжки только для социально-правовых запросов.
 - `ArchiveService.CompleteRequest(...)` бросает `InvalidOperationException`, если предварительные условия не соблюдены.
 
 ### Автопарк
@@ -46,7 +47,7 @@ AhuErp.sln
 
 ### UI / MVVM
 - `MainViewModel` держит `ObservableCollection<NavigationItem>` и свойство `CurrentViewModel`.
-- Сайдбар: «Дашборд / Канцелярия / Архив / IT-служба / Автопарк», каждая кнопка через `RelayCommand` переключает `SelectedNavigationItem`.
+- Сайдбар: «Дашборд / Документационное обеспечение / Архивный отдел / Склад / ТМЦ / ИТО / Транспорт», каждая кнопка через `RelayCommand` переключает `SelectedNavigationItem`.
 - `OverdueRowColorConverter` — `IValueConverter`, возвращающий `Red` / `Yellow` / `Transparent` в зависимости от `Document.Deadline` и `Status`.
 
 ## Быстрый старт
@@ -76,13 +77,13 @@ dotnet run --project src\AhuErp.UI\AhuErp.UI.csproj
 
 | Поле        | Значение                  |
 |-------------|---------------------------|
-| ФИО         | `Иванов Иван Иванович`    |
+| ФИО         | `Администратор МКУ АХУ БМР` |
 | Пароль      | `password`                |
 | Роль        | `Admin`                   |
 
 Если в БД уже есть строки в `Employees` (например, был раскомментирован сид-блок
 в `scripts/create-db.sql`), но ни у кого нет `PasswordHash` — сидер обновит
-существующего «Иванов Иван Иванович» (или создаст нового), чтобы вход был возможен.
+существующего «Администратор МКУ АХУ БМР» (или создаст нового), чтобы вход был возможен.
 
 ## Phase 6: переключение DI с in-memory на EF6
 
@@ -164,8 +165,8 @@ mono tools/MigrationGenerator/bin/Debug/MigrationGenerator.exe \
 - `EmployeeRole` (Admin / Manager / Archivist / TechSupport / WarehouseManager) и `PasswordHash` добавлены к `Employee`. Миграция `AddEmployeeAuth` (`20260423125626`) добавляет соответствующие колонки.
 - `IAuthService`/`AuthService` + PBKDF2-`Pbkdf2PasswordHasher` с константным сравнением. `LoginWindow` показывается первым при старте приложения; `MainWindow` открывается только после успешной аутентификации.
 - RBAC: `RolePolicy` — декларативная таблица «роль → доступные модули»; `MainViewModel` фильтрует `NavigationItems` по текущему пользователю, `BooleanToVisibilityConverter` скрывает недоступные пункты меню.
-- CRUD экраны «Канцелярия» (Incoming/Internal документы, `OfficeView`) и «Архив» (`ArchiveRequest` со скан-чекбоксами и действием «Завершить», `ArchiveView`) — работают поверх `IDocumentRepository` (in-memory на Phase 2, EF6 на Phase 3+).
-- Демо-пользователи (пароль `password`): «Иванов Иван Иванович» (Admin), «Петров Пётр Петрович» (Manager), «Сидорова Анна Сергеевна» (Archivist), «Кузнецов Алексей Викторович» (TechSupport), «Орлова Мария Николаевна» (WarehouseManager).
+- CRUD экраны «Отдел документационного обеспечения» (Incoming/Internal документы, `OfficeView`) и «Архивный отдел» (`ArchiveRequest` со скан-чекбоксами и действием «Завершить», `ArchiveView`) — работают поверх `IDocumentRepository` (in-memory на Phase 2, EF6 на Phase 3+).
+- Демо-пользователи (пароль `password`): «Администратор МКУ АХУ БМР» (Admin), «Стерликов Дмитрий Николаевич» (Manager), «Бурдина Галина Николаевна» (Archivist), «Дорофеев Артем Валерьевич» (TechSupport), «Зайченко Татьяна Александровна» (WarehouseManager).
 - Тесты: **+38** — `AuthServiceTests`, `PasswordHasherTests`, `RolePolicyTests`, `InMemoryDocumentRepositoryTests`. Итого 59 зелёных.
 
 ## Phase 3 — Warehouse / ТМЦ + IT-Service (Help Desk)
@@ -201,7 +202,7 @@ InventoryTransaction.DocumentId? ──(FK, ON DELETE NO ACTION)──► Docume
 - `IFleetService` получает вторую перегрузку `BookVehicle(int vehicleId, int documentId, DateTime start, DateTime end, string driverName)`. Phase 1-перегрузка `BookVehicle(Vehicle, ...)` сохранена для обратной совместимости и тестов.
 - UI: `FleetView` — три секции (список ТС → расписание выбранного ТС → форма бронирования с `DatePicker`/`TextBox`/`ComboBox` документа). Кнопка «Забронировать» ловит `VehicleBookingException` и показывает пользователю понятное сообщение без закрытия формы.
 - DI: `IVehicleRepository`, `IFleetService` и `FleetViewModel` зарегистрированы в `AppServices`. `MainWindow.xaml` подключает `FleetView` вместо плейсхолдера.
-- Демо-данные (`DemoDataSeeder.SeedFleet`): Ford Focus / Lada Largus / «Газель» (последняя на обслуживании) + две тестовые заявки на транспорт (`DocumentType.Fleet`).
+- Демо-данные (`DemoDataSeeder.SeedFleet`): Lada Largus / «ГАЗель NEXT» / «УАЗ Патриот» (последний на обслуживании) + две заявки на транспорт (`DocumentType.Fleet`), привязанные к адресам МКУ «АХУ» БМР.
 - Тесты: **+10** (`FleetServicePhase4Tests`) — успешное бронирование без пересечений; точное / частичное (слева и справа) / содержащее пересечение; стыковка интервалов [a,b) без пересечения; отсутствие ТС; ТС на обслуживании; пустые `driverName` / `documentId`. Итого **78 / 78**.
 
 ### LINQ-логика проверки пересечений
@@ -223,7 +224,7 @@ existingTrips.Any(t => t.VehicleId == vehicleId
 - **NuGet**: `ClosedXML 0.102.3` + `DocumentFormat.OpenXml 2.20.0` (в `AhuErp.Core`) и `LiveCharts.Wpf 0.9.7` (в `AhuErp.UI`). Все три пакета совместимы с `net48` и не требуют установленного MS Office.
 - **`IReportService`** (`AhuErp.Core`):
   - `ExportInventoryToExcel(filePath)` — ClosedXML, лист «Склад ТМЦ», отформатированная шапка (bold + фон LightSteelBlue + нижняя граница), колонки `№ / Наименование / Категория / Остаток`, `Columns().AdjustToContents()`.
-  - `GenerateArchiveCertificate(archiveRequestId, filePath)` — DOCX через `WordprocessingDocument` + `DocumentFormat.OpenXml.Wordprocessing`. Заголовок «СПРАВКА о стаже», подстановка `№`, даты создания, темы, срока, статусов сканов паспорта/трудовой и выбор одного из двух формальных абзацев (полный пакет / требуется досбор).
+  - `GenerateArchiveCertificate(archiveRequestId, filePath)` — DOCX через `WordprocessingDocument` + `DocumentFormat.OpenXml.Wordprocessing`. Заголовок «АРХИВНАЯ СПРАВКА», реквизиты архивного отдела, подстановка `№`, даты создания, вида запроса, темы, срока, статусов сканов паспорта/трудовой и выбор одного из двух формальных абзацев (полный пакет / требуется досбор).
 - **UI**:
   - `WarehouseViewModel.ExportToExcelCommand` — `IFileDialogService.PromptSaveFile(...)` → `IReportService.ExportInventoryToExcel`. Отдельно обрабатываются `IOException` (файл занят), `UnauthorizedAccessException` и прочие `Exception`.
   - `ArchiveViewModel.GenerateCertificateCommand` — аналогичный flow для Word-справки, активна только при выбранной заявке.

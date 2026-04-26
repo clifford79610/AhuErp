@@ -68,6 +68,10 @@ namespace AhuErp.Core.Data
                 .HasForeignKey(d => d.AssignedEmployeeId)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<ArchiveRequest>()
+                .Property(r => r.RequestKind)
+                .HasColumnName("ArchiveRequestKind");
+
             modelBuilder.Entity<Vehicle>()
                 .ToTable("Vehicles");
 

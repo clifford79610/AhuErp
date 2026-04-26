@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 namespace AhuErp.UI.ViewModels
 {
     /// <summary>
-    /// ViewModel раздела «Автопарк». Разделён на три секции:
+    /// ViewModel раздела «Транспортное обслуживание». Разделён на три секции:
     /// список ТС, расписание поездок выбранного ТС, форма бронирования.
     /// Бронирование проходит через <see cref="IFleetService.BookVehicle(int, int, DateTime, DateTime, string)"/>,
     /// который применяет Allen-overlap к существующим поездкам.

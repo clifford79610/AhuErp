@@ -14,7 +14,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Канцелярия — входящие и внутренние документы"
+        <TextBlock Text="Отдел документационного обеспечения"
                    FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16" />
 
         <DataGrid Grid.Row="1"
