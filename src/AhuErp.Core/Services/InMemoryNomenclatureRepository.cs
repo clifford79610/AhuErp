@@ -77,10 +77,10 @@ namespace AhuErp.Core.Services
             return _sequences.TryGetValue((documentTypeRefId, year), out var s) ? s : 0;
         }
 
-        /// <summary>Тестовый помощник: зафиксировать выданный порядковый номер.</summary>
-        public void RegisterSequence(int documentTypeRefId, int year, int sequence)
+        public void BumpSequence(int documentTypeRefId, int year, int sequence)
         {
-            _sequences[(documentTypeRefId, year)] = sequence;
+            var current = GetMaxSequence(documentTypeRefId, year);
+            if (sequence > current) _sequences[(documentTypeRefId, year)] = sequence;
         }
 
         public IReadOnlyList<Department> ListDepartments() => _departments.AsReadOnly();

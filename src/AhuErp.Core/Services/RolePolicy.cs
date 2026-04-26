@@ -17,28 +17,35 @@ namespace AhuErp.Core.Services
         public const string Fleet = nameof(Fleet);
         public const string Warehouse = nameof(Warehouse);
 
+        // Phase 7 — модули, появляющиеся вместе с СЭД-функционалом.
+        public const string MyTasks = nameof(MyTasks);
+        public const string Nomenclature = nameof(Nomenclature);
+        public const string AuditJournal = nameof(AuditJournal);
+
         private static readonly IReadOnlyDictionary<EmployeeRole, HashSet<string>> _allowed =
             new Dictionary<EmployeeRole, HashSet<string>>
             {
                 [EmployeeRole.Admin] = new HashSet<string>
                 {
-                    Dashboard, Office, Archive, ItService, Fleet, Warehouse
+                    Dashboard, Office, Archive, ItService, Fleet, Warehouse,
+                    MyTasks, Nomenclature, AuditJournal
                 },
                 [EmployeeRole.Manager] = new HashSet<string>
                 {
-                    Dashboard, Office, Archive, ItService, Fleet, Warehouse
+                    Dashboard, Office, Archive, ItService, Fleet, Warehouse,
+                    MyTasks, Nomenclature
                 },
                 [EmployeeRole.Archivist] = new HashSet<string>
                 {
-                    Dashboard, Archive
+                    Dashboard, Archive, MyTasks, Nomenclature
                 },
                 [EmployeeRole.TechSupport] = new HashSet<string>
                 {
-                    Dashboard, ItService
+                    Dashboard, ItService, MyTasks
                 },
                 [EmployeeRole.WarehouseManager] = new HashSet<string>
                 {
-                    Dashboard, Office, Fleet, Warehouse
+                    Dashboard, Office, Fleet, Warehouse, MyTasks
                 },
             };
 

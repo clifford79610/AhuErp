@@ -33,21 +33,29 @@ namespace AhuErp.UI.ViewModels
         public MainViewModel(IAuthService auth,
                              DashboardViewModel dashboardVm,
                              OfficeViewModel officeVm,
+                             RkkViewModel rkkVm,
                              ArchiveViewModel archiveVm,
                              ItServiceViewModel itServiceVm,
                              FleetViewModel fleetVm,
-                             WarehouseViewModel warehouseVm)
+                             WarehouseViewModel warehouseVm,
+                             MyTasksViewModel myTasksVm,
+                             NomenclatureViewModel nomenclatureVm,
+                             AuditJournalViewModel auditJournalVm)
         {
             _auth = auth ?? throw new ArgumentNullException(nameof(auth));
 
             NavigationItems = new ObservableCollection<NavigationItem>
             {
                 new NavigationItem("Дашборд",    RolePolicy.Dashboard, dashboardVm),
+                new NavigationItem("РКК (документы)", RolePolicy.Office, rkkVm),
                 new NavigationItem("Документационное обеспечение", RolePolicy.Office,    officeVm),
+                new NavigationItem("Мои задачи",  RolePolicy.MyTasks,   myTasksVm),
                 new NavigationItem("Архивный отдел", RolePolicy.Archive, archiveVm),
                 new NavigationItem("Склад / ТМЦ", RolePolicy.Warehouse, warehouseVm),
                 new NavigationItem("ИТО",        RolePolicy.ItService, itServiceVm),
                 new NavigationItem("Транспорт",  RolePolicy.Fleet,     fleetVm),
+                new NavigationItem("Номенклатура дел", RolePolicy.Nomenclature, nomenclatureVm),
+                new NavigationItem("Журнал аудита", RolePolicy.AuditJournal, auditJournalVm),
             };
 
             ApplyRolePolicy();

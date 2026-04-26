@@ -85,6 +85,14 @@ namespace AhuErp.Core.Services
             return query.Count();
         }
 
+        /// <summary>
+        /// В EF-реализации <see cref="GetMaxSequence"/> вычисляется по реальным
+        /// документам, поэтому отдельный счётчик не нужен — метод пустой.
+        /// </summary>
+        public void BumpSequence(int documentTypeRefId, int year, int sequence)
+        {
+        }
+
         public IReadOnlyList<Department> ListDepartments()
             => _ctx.Departments.OrderBy(d => d.Name).ToList().AsReadOnly();
 

@@ -34,7 +34,7 @@
         </Border>
 
         <!-- KPI Cards -->
-        <UniformGrid Grid.Row="2" Columns="5" Rows="1" Margin="0,0,0,16">
+        <UniformGrid Grid.Row="2" Columns="6" Rows="2" Margin="0,0,0,16">
             <Border Background="White" CornerRadius="4" Padding="16" Margin="0,0,8,0">
                 <StackPanel>
                     <TextBlock Text="Просроченные архив. заявки" Foreground="#6B7280" FontSize="12" />
@@ -63,6 +63,24 @@
                 <StackPanel>
                     <TextBlock Text="Дедлайн ≤ 3 дн." Foreground="#6B7280" FontSize="12" />
                     <TextBlock Text="{Binding DueSoonCount}" FontSize="32" FontWeight="Bold" Foreground="#CA8A04" />
+                </StackPanel>
+            </Border>
+            <Border Background="White" CornerRadius="4" Padding="16" Margin="0,8,8,0">
+                <StackPanel>
+                    <TextBlock Text="Открытые поручения" Foreground="#6B7280" FontSize="12" />
+                    <TextBlock Text="{Binding OpenTasks}" FontSize="32" FontWeight="Bold" Foreground="#2563EB" />
+                </StackPanel>
+            </Border>
+            <Border Background="White" CornerRadius="4" Padding="16" Margin="4,8,4,0">
+                <StackPanel>
+                    <TextBlock Text="Просроченные поручения" Foreground="#6B7280" FontSize="12" />
+                    <TextBlock Text="{Binding OverdueTasks}" FontSize="32" FontWeight="Bold" Foreground="#DC2626" />
+                </StackPanel>
+            </Border>
+            <Border Background="White" CornerRadius="4" Padding="16" Margin="4,8,4,0" Grid.ColumnSpan="2">
+                <StackPanel>
+                    <TextBlock Text="Исполнительская дисциплина" Foreground="#6B7280" FontSize="12" />
+                    <TextBlock Text="{Binding TimelyExecutionDisplay}" FontSize="22" FontWeight="Bold" Foreground="#059669" />
                 </StackPanel>
             </Border>
         </UniformGrid>

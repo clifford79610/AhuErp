@@ -134,6 +134,7 @@ namespace AhuErp.Core.Services
                     doc.NomenclatureCaseId = @case.Id;
                 }
                 _documents.Update(doc);
+                _repository.BumpSequence(typeRef.Id, year, sequence);
             }
 
             _audit.Record(AuditActionType.Registered, nameof(Document), doc.Id, doc.AuthorId,

@@ -1,0 +1,264 @@
+<UserControl x:Class="AhuErp.UI.Views.RkkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AhuErp.UI.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:RkkViewModel}"
+             d:DesignHeight="720" d:DesignWidth="1200">
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+            <TextBlock DockPanel.Dock="Top"
+                       Text="Регистрационно-контрольная карточка"
+                       FontSize="16" FontWeight="SemiBold"
+                       Margin="0,0,0,8" TextWrapping="Wrap" />
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                <Button Content="Новый" Command="{Binding NewCommand}" MinWidth="70" Padding="6,3" Margin="0,0,6,0" />
+                <Button Content="Обновить" Command="{Binding ReloadCommand}" MinWidth="80" Padding="6,3" />
+            </StackPanel>
+            <DataGrid ItemsSource="{Binding Documents}"
+                      SelectedItem="{Binding SelectedDocument, UpdateSourceTrigger=PropertyChanged}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False" CanUserDeleteRows="False"
+                      IsReadOnly="True"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      RowBackground="Transparent">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="№" Binding="{Binding RegistrationNumber}" Width="120" />
+                    <DataGridTextColumn Header="Тема" Binding="{Binding Title}" Width="*" />
+                    <DataGridTextColumn Header="Создан" Binding="{Binding CreationDate, StringFormat=dd.MM.yy}" Width="80" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <Border Grid.Column="1" Background="White" CornerRadius="4" Padding="12">
+            <DockPanel>
+                <Border DockPanel.Dock="Top"
+                        Background="#FEE2E2" BorderBrush="#DC2626" BorderThickness="1"
+                        CornerRadius="4" Padding="8,4" Margin="0,0,0,8"
+                        Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+                    <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" TextWrapping="Wrap" />
+                </Border>
+
+                <TabControl>
+                    <TabItem Header="1. Реквизиты">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Регистрационный номер" Margin="0,4" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SelectedDocument.RegistrationNumber, FallbackValue='— ещё не зарегистрирован —'}"
+                                           FontWeight="SemiBold" Margin="6,4" />
+
+                                <TextBlock Grid.Row="1" Text="Дата регистрации" Margin="0,4" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                           Text="{Binding SelectedDocument.RegistrationDate, StringFormat=dd.MM.yyyy HH:mm, FallbackValue=''}"
+                                           Margin="6,4" />
+
+                                <TextBlock Grid.Row="2" Text="Вид документа" Margin="0,4" />
+                                <ComboBox Grid.Row="2" Grid.Column="1"
+                                          ItemsSource="{Binding DocumentTypes}"
+                                          SelectedItem="{Binding SelectedType}"
+                                          DisplayMemberPath="Name"
+                                          Margin="6,4" Padding="6" />
+
+                                <TextBlock Grid.Row="3" Text="Дело (номенклатура)" Margin="0,4" />
+                                <ComboBox Grid.Row="3" Grid.Column="1"
+                                          ItemsSource="{Binding NomenclatureCases}"
+                                          SelectedItem="{Binding SelectedCase}"
+                                          Margin="6,4" Padding="6">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <Run Text="{Binding Index}" FontWeight="SemiBold" />
+                                                <Run Text=" — " />
+                                                <Run Text="{Binding Title}" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Grid.Row="4" Text="Направление" Margin="0,4" />
+                                <ComboBox Grid.Row="4" Grid.Column="1"
+                                          ItemsSource="{Binding Directions}"
+                                          SelectedItem="{Binding SelectedDirection}"
+                                          ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
+                                          Margin="6,4" Padding="6" />
+
+                                <TextBlock Grid.Row="5" Text="Гриф доступа" Margin="0,4" />
+                                <ComboBox Grid.Row="5" Grid.Column="1"
+                                          ItemsSource="{Binding AccessLevels}"
+                                          SelectedItem="{Binding SelectedAccessLevel}"
+                                          ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
+                                          Margin="6,4" Padding="6" />
+
+                                <TextBlock Grid.Row="6" Text="Заголовок" Margin="0,4" />
+                                <TextBox Grid.Row="6" Grid.Column="1"
+                                         Text="{Binding DraftTitle, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="6,4" Padding="6" />
+
+                                <TextBlock Grid.Row="7" Text="Корреспондент" Margin="0,4" />
+                                <TextBox Grid.Row="7" Grid.Column="1"
+                                         Text="{Binding DraftCorrespondent, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="6,4" Padding="6" />
+
+                                <TextBlock Grid.Row="8" Text="Срок исполнения" Margin="0,4" />
+                                <DatePicker Grid.Row="8" Grid.Column="1"
+                                            SelectedDate="{Binding DraftDeadline, UpdateSourceTrigger=PropertyChanged}"
+                                            Margin="6,4" />
+
+                                <TextBlock Grid.Row="9" Text="Краткое содержание" Margin="0,4" />
+                                <TextBox Grid.Row="9" Grid.Column="1"
+                                         Text="{Binding DraftSummary, UpdateSourceTrigger=PropertyChanged}"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         Height="80" Margin="6,4" Padding="6"
+                                         VerticalScrollBarVisibility="Auto" />
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="2. Вложения">
+                        <DockPanel Margin="12">
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="Файлы документа с историей версий. Используйте кнопки для добавления версий и просмотра."
+                                       Foreground="#6B7280" Margin="0,0,0,8" TextWrapping="Wrap" />
+                            <DataGrid ItemsSource="{Binding Attachments}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False" CanUserDeleteRows="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Версия" Binding="{Binding VersionNumber}" Width="60" />
+                                    <DataGridTextColumn Header="Файл" Binding="{Binding FileName}" Width="*" />
+                                    <DataGridTextColumn Header="Тип" Binding="{Binding FileType, Converter={StaticResource EnumDisplayConverter}}" Width="100" />
+                                    <DataGridTextColumn Header="Загружено" Binding="{Binding UploadedAt, StringFormat=dd.MM.yyyy HH:mm}" Width="140" />
+                                    <DataGridCheckBoxColumn Header="Текущая" Binding="{Binding IsCurrentVersion}" Width="80" />
+                                    <DataGridTextColumn Header="Размер, байт" Binding="{Binding SizeBytes}" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+
+                    <TabItem Header="3. Поручения и контроль">
+                        <DockPanel Margin="12">
+                            <Border DockPanel.Dock="Top" Background="#F9FAFB" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding NewTaskDescription, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,0,6,0" Padding="6"
+                                             VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding NewTaskExecutorId, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="ID исполнителя"
+                                             Margin="0,0,6,0" Padding="6"
+                                             VerticalAlignment="Center" />
+                                    <DatePicker Grid.Column="2"
+                                                SelectedDate="{Binding NewTaskDeadline}"
+                                                Margin="0,0,6,0" />
+                                    <Button Grid.Column="3"
+                                            Content="Создать поручение"
+                                            Command="{Binding AddTaskCommand}"
+                                            Padding="8,4" />
+                                </Grid>
+                            </Border>
+                            <DataGrid ItemsSource="{Binding Tasks}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False" CanUserDeleteRows="False"
+                                      IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="40" />
+                                    <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*" />
+                                    <DataGridTextColumn Header="Исполнитель" Binding="{Binding ExecutorId}" Width="100" />
+                                    <DataGridTextColumn Header="Срок" Binding="{Binding Deadline, StringFormat=dd.MM.yyyy}" Width="100" />
+                                    <DataGridTextColumn Header="Статус" Binding="{Binding Status, Converter={StaticResource EnumDisplayConverter}}" Width="120" />
+                                    <DataGridTextColumn Header="Завершено" Binding="{Binding CompletedAt, StringFormat=dd.MM.yyyy}" Width="100" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+
+                    <TabItem Header="4. Согласование и маршрут">
+                        <DockPanel Margin="12">
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="Этапы маршрута согласования. Решения по каждому этапу формируют итоговый статус документа."
+                                       Foreground="#6B7280" Margin="0,0,0,8" TextWrapping="Wrap" />
+                            <DataGrid ItemsSource="{Binding Approvals}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False" CanUserDeleteRows="False"
+                                      IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Этап" Binding="{Binding Order}" Width="60" />
+                                    <DataGridTextColumn Header="Согласующий" Binding="{Binding ApproverId}" Width="120" />
+                                    <DataGridTextColumn Header="Параллельно" Binding="{Binding IsParallel}" Width="100" />
+                                    <DataGridTextColumn Header="Решение" Binding="{Binding Decision, Converter={StaticResource EnumDisplayConverter}}" Width="120" />
+                                    <DataGridTextColumn Header="Дата" Binding="{Binding DecisionDate, StringFormat=dd.MM.yyyy HH:mm}" Width="140" />
+                                    <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+
+                    <TabItem Header="5. Связанные документы и АХД">
+                        <Grid Margin="12">
+                            <TextBlock Text="Связи с АХД-операциями (списания ТМЦ, путевые листы, заявки в архив, IT-тикеты). Создание из РКК — в следующих версиях."
+                                       TextWrapping="Wrap" Foreground="#6B7280" />
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="6. История и аудит">
+                        <DockPanel Margin="12">
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="Хронология действий по документу. Цепочка hash-целостности проверяется в журнале аудита."
+                                       Foreground="#6B7280" Margin="0,0,0,8" TextWrapping="Wrap" />
+                            <DataGrid ItemsSource="{Binding History}"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False" CanUserDeleteRows="False"
+                                      IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Время" Binding="{Binding Timestamp, StringFormat=dd.MM.yyyy HH:mm:ss}" Width="160" />
+                                    <DataGridTextColumn Header="Действие" Binding="{Binding ActionType, Converter={StaticResource EnumDisplayConverter}}" Width="160" />
+                                    <DataGridTextColumn Header="Пользователь" Binding="{Binding UserId}" Width="100" />
+                                    <DataGridTextColumn Header="Изменения" Binding="{Binding NewValues}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+                </TabControl>
+
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button Content="Сохранить" Command="{Binding SaveCommand}" MinWidth="100" Padding="8,4" Margin="0,0,6,0" />
+                    <Button Content="Зарегистрировать" Command="{Binding RegisterCommand}" MinWidth="140" Padding="8,4" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

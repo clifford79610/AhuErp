@@ -19,6 +19,14 @@ namespace AhuErp.Core.Services
         /// <summary>Получить максимальную последовательность регистрационных номеров для пары вид/год.</summary>
         int GetMaxSequence(int documentTypeRefId, int year);
 
+        /// <summary>
+        /// Зафиксировать факт выдачи регистрационного номера. Реализации,
+        /// вычисляющие <see cref="GetMaxSequence"/> по реальным документам
+        /// (например, EF6), могут оставить метод пустым; реализации со
+        /// своим счётчиком (in-memory) обязаны его обновить.
+        /// </summary>
+        void BumpSequence(int documentTypeRefId, int year, int sequence);
+
         IReadOnlyList<Department> ListDepartments();
         Department AddDepartment(Department department);
     }
