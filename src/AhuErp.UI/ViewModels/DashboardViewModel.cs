@@ -133,7 +133,10 @@ namespace AhuErp.UI.ViewModels
 
         private void ApplyTaskKpi()
         {
-            var now = DateTime.UtcNow;
+            // Используем локальное время — Deadline в DocumentTask хранится
+            // в local time (источник — UI/DateTime.Now), и сравнение должно
+            // идти в той же шкале, иначе теряем часы из-за часового пояса.
+            var now = DateTime.Now;
             var report = _tasks.BuildDisciplineReport(now.AddMonths(-1), now.AddMonths(1));
             OpenTasks = report.InProgress;
             OverdueTasks = report.Overdue;

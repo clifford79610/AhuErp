@@ -41,7 +41,7 @@ namespace AhuErp.Core.Services
                 DocumentId = doc.Id,
                 AuthorId = authorId,
                 Text = text,
-                IssuedAt = DateTime.UtcNow
+                IssuedAt = DateTime.Now
             };
             resolution = _tasks.AddResolution(resolution);
             _audit.Record(AuditActionType.ResolutionIssued, nameof(DocumentResolution), resolution.Id, authorId,
@@ -63,7 +63,7 @@ namespace AhuErp.Core.Services
         {
             if (string.IsNullOrWhiteSpace(description))
                 throw new ArgumentException("Текст поручения обязателен.", nameof(description));
-            if (deadline <= DateTime.UtcNow.Date)
+            if (deadline <= DateTime.Now.Date)
                 throw new ArgumentException("Срок исполнения должен быть в будущем.", nameof(deadline));
 
             var doc = _documents.GetById(documentId)
@@ -80,7 +80,7 @@ namespace AhuErp.Core.Services
                 ControllerId = controllerId,
                 CoExecutors = coExecutors,
                 Description = description,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 Deadline = deadline,
                 Status = DocumentTaskStatus.New,
                 IsCritical = isCritical
@@ -101,7 +101,7 @@ namespace AhuErp.Core.Services
             task.ReportText = reportText ?? task.ReportText;
             if (newStatus == DocumentTaskStatus.Completed)
             {
-                task.CompletedAt = DateTime.UtcNow;
+                task.CompletedAt = DateTime.Now;
             }
             _tasks.UpdateTask(task);
 
@@ -173,7 +173,9 @@ namespace AhuErp.Core.Services
             // Просрочка определяется относительно текущего момента (а не конца
             // отчётного периода): иначе ещё не наступившие сроки в будущем
             // ошибочно учитывались бы как пропущенные.
-            var now = DateTime.UtcNow;
+            // Используем локальное время — Deadline хранится в local time из UI,
+            // и сравнение с UtcNow давало сдвиг до часов часового пояса.
+            var now = DateTime.Now;
             var inRange = _tasks.ListAll()
                 .Where(t => t.CreatedAt >= from && t.CreatedAt <= to)
                 .ToList();
