@@ -31,6 +31,18 @@
         <DataTemplate DataType="{x:Type vm:FleetViewModel}">
             <views:FleetView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RkkViewModel}">
+            <views:RkkView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:MyTasksViewModel}">
+            <views:MyTasksView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:NomenclatureViewModel}">
+            <views:NomenclatureView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AuditJournalViewModel}">
+            <views:AuditJournalView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>

@@ -1,0 +1,64 @@
+<UserControl x:Class="AhuErp.UI.Views.AuditJournalView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AhuErp.UI.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:AuditJournalViewModel}"
+             d:DesignHeight="600" d:DesignWidth="1100">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Журнал аудита" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,12" />
+
+        <Border Grid.Row="1" Padding="12" Background="White" CornerRadius="4" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="С:" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <DatePicker SelectedDate="{Binding From}" Width="120" Margin="0,0,12,0" />
+                <TextBlock Text="По:" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <DatePicker SelectedDate="{Binding To}" Width="120" Margin="0,0,12,0" />
+                <TextBlock Text="Действие:" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <ComboBox ItemsSource="{Binding ActionTypes}"
+                          SelectedItem="{Binding ActionType}"
+                          ItemTemplate="{StaticResource EnumComboBoxItemTemplate}"
+                          MinWidth="160" Margin="0,0,12,0" Padding="6" />
+                <TextBlock Text="Сущность:" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <TextBox Text="{Binding EntityType, UpdateSourceTrigger=PropertyChanged}"
+                         Width="120" Padding="6" Margin="0,0,12,0" />
+                <Button Content="Применить" Command="{Binding ReloadCommand}" Padding="10,4" Margin="0,0,6,0" />
+                <Button Content="Проверить целостность" Command="{Binding VerifyIntegrityCommand}" Padding="10,4" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="#ECFDF5" BorderBrush="#10B981" BorderThickness="1"
+                CornerRadius="4" Padding="8,4" Margin="0,0,0,8"
+                Visibility="{Binding IntegrityStatus, Converter={StaticResource StringToVisibilityConverter}}">
+            <TextBlock Text="{Binding IntegrityStatus}" Foreground="#065F46" TextWrapping="Wrap" />
+        </Border>
+
+        <DataGrid Grid.Row="3"
+                  ItemsSource="{Binding Entries}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False" CanUserDeleteRows="False"
+                  IsReadOnly="True"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Время" Binding="{Binding Timestamp, StringFormat=dd.MM.yyyy HH:mm:ss}" Width="160" />
+                <DataGridTextColumn Header="Пользователь" Binding="{Binding UserId}" Width="100" />
+                <DataGridTextColumn Header="Действие" Binding="{Binding ActionType, Converter={StaticResource EnumDisplayConverter}}" Width="160" />
+                <DataGridTextColumn Header="Сущность" Binding="{Binding EntityType}" Width="120" />
+                <DataGridTextColumn Header="Id" Binding="{Binding EntityId}" Width="60" />
+                <DataGridTextColumn Header="Старое" Binding="{Binding OldValues}" Width="*" />
+                <DataGridTextColumn Header="Новое" Binding="{Binding NewValues}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

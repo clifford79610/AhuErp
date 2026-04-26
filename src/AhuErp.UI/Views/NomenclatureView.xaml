@@ -1,0 +1,112 @@
+<UserControl x:Class="AhuErp.UI.Views.NomenclatureView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:AhuErp.UI.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:NomenclatureViewModel}"
+             d:DesignHeight="600" d:DesignWidth="1100">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Номенклатура и виды документов" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,12" />
+
+        <Border Grid.Row="1"
+                Background="#FEE2E2" BorderBrush="#DC2626" BorderThickness="1"
+                CornerRadius="4" Padding="10,6" Margin="0,0,0,8"
+                Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="#991B1B" TextWrapping="Wrap" />
+        </Border>
+
+        <TabControl Grid.Row="2">
+            <TabItem Header="Дела (номенклатура)">
+                <DockPanel Margin="12">
+                    <Border DockPanel.Dock="Top" Background="#F9FAFB" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding NewCaseIndex, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Индекс (например, 01-02)"
+                                     Margin="0,0,6,0" Padding="6" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding NewCaseTitle, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Заголовок дела"
+                                     Margin="0,0,6,0" Padding="6" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding NewCaseRetention, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Срок хранения, лет"
+                                     Margin="0,0,6,0" Padding="6" VerticalAlignment="Center" />
+                            <Button Grid.Column="3" Content="Добавить" Command="{Binding AddCaseCommand}"
+                                    Padding="10,4" />
+                        </Grid>
+                    </Border>
+                    <DataGrid ItemsSource="{Binding Cases}"
+                              SelectedItem="{Binding SelectedCase}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Индекс" Binding="{Binding Index}" Width="100" />
+                            <DataGridTextColumn Header="Заголовок" Binding="{Binding Title}" Width="*" />
+                            <DataGridTextColumn Header="Срок хранения" Binding="{Binding RetentionPeriodYears}" Width="120" />
+                            <DataGridTextColumn Header="Статья" Binding="{Binding Article}" Width="100" />
+                            <DataGridTextColumn Header="Год" Binding="{Binding Year}" Width="60" />
+                            <DataGridCheckBoxColumn Header="Активно" Binding="{Binding IsActive}" Width="80" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Виды документов">
+                <DockPanel Margin="12">
+                    <Border DockPanel.Dock="Top" Background="#F9FAFB" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding NewTypeName, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Название вида"
+                                     Margin="0,0,6,0" Padding="6" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding NewTypeShortCode, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Код"
+                                     Margin="0,0,6,0" Padding="6" VerticalAlignment="Center" />
+                            <TextBox Grid.Column="2"
+                                     Text="{Binding NewTypeTemplate, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip="Шаблон номера"
+                                     Margin="0,0,6,0" Padding="6" VerticalAlignment="Center" />
+                            <Button Grid.Column="3" Content="Добавить" Command="{Binding AddTypeCommand}"
+                                    Padding="10,4" />
+                        </Grid>
+                    </Border>
+                    <DataGrid ItemsSource="{Binding Types}"
+                              SelectedItem="{Binding SelectedType}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Код" Binding="{Binding ShortCode}" Width="80" />
+                            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="Направление" Binding="{Binding DefaultDirection, Converter={StaticResource EnumDisplayConverter}}" Width="120" />
+                            <DataGridTextColumn Header="Срок хранения" Binding="{Binding DefaultRetentionYears}" Width="120" />
+                            <DataGridTextColumn Header="Шаблон номера" Binding="{Binding RegistrationNumberTemplate}" Width="*" />
+                            <DataGridCheckBoxColumn Header="Активно" Binding="{Binding IsActive}" Width="80" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

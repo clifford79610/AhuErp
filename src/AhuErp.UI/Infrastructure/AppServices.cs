@@ -59,6 +59,25 @@ namespace AhuErp.UI.Infrastructure
             services.AddSingleton<IFleetService>(sp => new FleetService(sp.GetRequiredService<IVehicleRepository>()));
             services.AddSingleton<IReportService, ReportService>();
 
+            // Phase 7: enterprise EDMS-сервисы. Все построены поверх единого
+            // AhuDbContext-singleton, доступ из UI-потока.
+            services.AddSingleton<IAuditLogRepository, EfAuditLogRepository>();
+            services.AddSingleton<IAuditService, AuditService>();
+
+            services.AddSingleton<INomenclatureRepository, EfNomenclatureRepository>();
+            services.AddSingleton<INomenclatureService, NomenclatureService>();
+
+            services.AddSingleton<IFileStorageService>(sp => new FileSystemStorageService());
+            services.AddSingleton<IAttachmentRepository, EfAttachmentRepository>();
+            services.AddSingleton<IAttachmentService, AttachmentService>();
+
+            services.AddSingleton<ITaskRepository, EfTaskRepository>();
+            services.AddSingleton<IWorkflowService, WorkflowService>();
+            services.AddSingleton<ITaskService, TaskService>();
+
+            services.AddSingleton<IApprovalRepository, EfApprovalRepository>();
+            services.AddSingleton<IApprovalService, ApprovalService>();
+
             // UI-инфраструктура
             services.AddSingleton<IFileDialogService, FileDialogService>();
 
@@ -71,6 +90,10 @@ namespace AhuErp.UI.Infrastructure
             services.AddTransient<ItServiceViewModel>();
             services.AddTransient<FleetViewModel>();
             services.AddTransient<WarehouseViewModel>();
+            services.AddTransient<RkkViewModel>();
+            services.AddTransient<MyTasksViewModel>();
+            services.AddTransient<NomenclatureViewModel>();
+            services.AddTransient<AuditJournalViewModel>();
         }
     }
 }

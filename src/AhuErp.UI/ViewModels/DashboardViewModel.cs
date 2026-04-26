@@ -24,6 +24,7 @@ namespace AhuErp.UI.ViewModels
         private readonly IDocumentRepository _documents;
         private readonly IInventoryRepository _inventory;
         private readonly IVehicleRepository _vehicles;
+        private readonly ITaskService _tasks;
 
         [ObservableProperty]
         private int overdueCount;
@@ -39,6 +40,18 @@ namespace AhuErp.UI.ViewModels
 
         [ObservableProperty]
         private int lowStockItems;
+
+        [ObservableProperty]
+        private int openTasks;
+
+        [ObservableProperty]
+        private int overdueTasks;
+
+        [ObservableProperty]
+        private double timelyExecutionRate;
+
+        [ObservableProperty]
+        private string timelyExecutionDisplay;
 
         [ObservableProperty]
         private bool isLoading;
@@ -60,11 +73,13 @@ namespace AhuErp.UI.ViewModels
 
         public DashboardViewModel(IDocumentRepository documents,
                                   IInventoryRepository inventory,
-                                  IVehicleRepository vehicles)
+                                  IVehicleRepository vehicles,
+                                  ITaskService tasks)
         {
             _documents = documents ?? throw new ArgumentNullException(nameof(documents));
             _inventory = inventory ?? throw new ArgumentNullException(nameof(inventory));
             _vehicles = vehicles ?? throw new ArgumentNullException(nameof(vehicles));
+            _tasks = tasks ?? throw new ArgumentNullException(nameof(tasks));
 
             // Безопасный запуск — не ждём Task, ошибки превращаем в no-op на уровне UI.
             _ = RefreshAsync();
@@ -103,6 +118,7 @@ namespace AhuErp.UI.ViewModels
                 var snapshot = await Task.Run(() => ComputeSnapshot(rawDocs, items, trips))
                     .ConfigureAwait(true);
                 ApplySnapshot(snapshot);
+                ApplyTaskKpi();
                 LastRefreshedDisplay = $"Обновлено: {DateTime.Now:HH:mm:ss}";
             }
             catch (Exception ex)
@@ -113,6 +129,21 @@ namespace AhuErp.UI.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        private void ApplyTaskKpi()
+        {
+            // Используем локальное время — Deadline в DocumentTask хранится
+            // в local time (источник — UI/DateTime.Now), и сравнение должно
+            // идти в той же шкале, иначе теряем часы из-за часового пояса.
+            var now = DateTime.Now;
+            var report = _tasks.BuildDisciplineReport(now.AddMonths(-1), now.AddMonths(1));
+            OpenTasks = report.InProgress;
+            OverdueTasks = report.Overdue;
+            TimelyExecutionRate = report.TimelyExecutionRate;
+            TimelyExecutionDisplay = report.TotalTasks == 0
+                ? "нет данных"
+                : $"{report.TimelyExecutionRate * 100:F0}% ({report.CompletedOnTime}/{report.TotalTasks})";
         }
 
         private DashboardSnapshot ComputeSnapshot(

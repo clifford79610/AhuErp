@@ -33,6 +33,14 @@ namespace AhuErp.Core.Models
         public string DriverName { get; set; }
 
         /// <summary>
+        /// Документ-основание расширенный (Phase 7): прямая ссылка на
+        /// зарегистрированный документ для отчётности и сквозного аудита.
+        /// </summary>
+        public int? BasisDocumentId { get; set; }
+
+        public virtual Document BasisDocument { get; set; }
+
+        /// <summary>
         /// Интервалы пересекаются при выполнении условия Allen-overlap: start1 &lt; end2 и start2 &lt; end1.
         /// </summary>
         public bool OverlapsWith(DateTime otherStart, DateTime otherEnd)
