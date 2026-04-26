@@ -33,5 +33,17 @@ namespace AhuErp.Core.Models
         public int InitiatorId { get; set; }
 
         public virtual Employee Initiator { get; set; }
+
+        /// <summary>
+        /// Расширенный идентификатор документа-основания: помимо
+        /// «прикладного» <see cref="DocumentId"/> в Phase 7 хранится прямая
+        /// ссылка на зарегистрированный документ-основание (ГОСТ-подход).
+        /// При наличии и того и другого они должны указывать на один и тот же
+        /// документ; <see cref="BasisDocumentId"/> сохранён для совместимости
+        /// модулей АХД, которые работают через журнал документов.
+        /// </summary>
+        public int? BasisDocumentId { get; set; }
+
+        public virtual Document BasisDocument { get; set; }
     }
 }
