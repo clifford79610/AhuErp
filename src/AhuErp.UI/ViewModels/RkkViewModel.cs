@@ -96,6 +96,10 @@ namespace AhuErp.UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
         [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
         [NotifyCanExecuteChangedFor(nameof(AddTaskCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CreateInventoryWriteOffCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CreateVehicleTripCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CreateArchiveRequestCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CreateItTicketCommand))]
         private Document selectedDocument;
 
         [ObservableProperty]
@@ -185,10 +189,6 @@ namespace AhuErp.UI.ViewModels
             ReloadApprovals();
             ReloadHistory();
             ReloadRelatedOps();
-            CreateInventoryWriteOffCommand.NotifyCanExecuteChanged();
-            CreateVehicleTripCommand.NotifyCanExecuteChanged();
-            CreateArchiveRequestCommand.NotifyCanExecuteChanged();
-            CreateItTicketCommand.NotifyCanExecuteChanged();
         }
 
         [RelayCommand]

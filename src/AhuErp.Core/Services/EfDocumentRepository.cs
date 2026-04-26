@@ -121,7 +121,13 @@ namespace AhuErp.Core.Services
             }
             if (filter.RegisteredOnly)
             {
-                q = q.Where(d => d.RegistrationNumber != null && d.RegistrationDate.HasValue);
+                // Согласовано с InMemory-реализацией и Document.IsRegistered:
+                // пустая строка в RegistrationNumber тоже трактуется как
+                // «не зарегистрирован». EF6/SQL не транслирует
+                // string.IsNullOrEmpty, поэтому раскрываем условие вручную.
+                q = q.Where(d => d.RegistrationNumber != null
+                                 && d.RegistrationNumber != ""
+                                 && d.RegistrationDate.HasValue);
             }
             if (filter.From.HasValue)
             {
