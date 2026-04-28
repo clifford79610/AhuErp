@@ -31,10 +31,17 @@ namespace AhuErp.Core.Services
             if (string.IsNullOrWhiteSpace(counterparty.ShortName))
                 throw new ArgumentException("ShortName обязателен.", nameof(counterparty));
 
-            var existingByInn = FindByInn(counterparty.Inn);
-            if (existingByInn != null)
-                throw new InvalidOperationException(
-                    $"Контрагент с ИНН '{counterparty.Inn}' уже существует (id={existingByInn.Id}).");
+            // Нормализуем пустой ИНН → null, чтобы поведение совпадало с
+            // EfCounterpartyRepository и filtered unique-индексом в БД.
+            if (string.IsNullOrWhiteSpace(counterparty.Inn)) counterparty.Inn = null;
+
+            if (counterparty.Inn != null)
+            {
+                var existingByInn = FindByInn(counterparty.Inn);
+                if (existingByInn != null)
+                    throw new InvalidOperationException(
+                        $"Контрагент с ИНН '{counterparty.Inn}' уже существует (id={existingByInn.Id}).");
+            }
 
             counterparty.Id = _nextId++;
             _items.Add(counterparty);
@@ -48,8 +55,10 @@ namespace AhuErp.Core.Services
             if (existing == null)
                 throw new InvalidOperationException($"Контрагент id={counterparty.Id} не найден.");
 
+            // Нормализуем пустой ИНН → null для согласованности с Add и БД.
+            if (string.IsNullOrWhiteSpace(counterparty.Inn)) counterparty.Inn = null;
             // INN-уникальность: запрещаем "перетянуть" чужой ИНН через Update.
-            if (!string.IsNullOrWhiteSpace(counterparty.Inn) &&
+            if (counterparty.Inn != null &&
                 !string.Equals(existing.Inn, counterparty.Inn, StringComparison.Ordinal) &&
                 _items.Any(x => x.Id != counterparty.Id &&
                                 string.Equals(x.Inn, counterparty.Inn, StringComparison.Ordinal)))

@@ -63,6 +63,24 @@ namespace AhuErp.Tests
         }
 
         [Fact]
+        public void ListFor_returns_defensive_copy_so_callers_cannot_mutate_global_state()
+        {
+            var snapshot1 = Permissions.ListFor(EmployeeRole.TechSupport);
+
+            // Попытка через downcast к ICollection<string> добавить TechSupport
+            // запрещённое право: должно либо бросить, либо НЕ повлиять на
+            // следующий ListFor / Has — доступа к внутренней коллекции нет.
+            try
+            {
+                ((System.Collections.Generic.ICollection<string>)snapshot1).Add(Permissions.DocumentDelete);
+            }
+            catch (System.NotSupportedException) { /* ok — read-only обёртка */ }
+
+            Assert.False(Permissions.Has(EmployeeRole.TechSupport, Permissions.DocumentDelete));
+            Assert.DoesNotContain(Permissions.DocumentDelete, Permissions.ListFor(EmployeeRole.TechSupport));
+        }
+
+        [Fact]
         public void ListFor_returns_consistent_set_with_Has()
         {
             foreach (EmployeeRole role in System.Enum.GetValues(typeof(EmployeeRole)))

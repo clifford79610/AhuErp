@@ -33,7 +33,12 @@ namespace AhuErp.Core.Services
         public Counterparty Add(Counterparty counterparty)
         {
             if (counterparty == null) throw new ArgumentNullException(nameof(counterparty));
-            if (!string.IsNullOrWhiteSpace(counterparty.Inn) &&
+            // Нормализуем пустой ИНН → null, иначе поведение расходится с
+            // filtered unique-индексом в БД (WHERE Inn IS NOT NULL): пустые строки
+            // проходят нашу C#-проверку (IsNullOrWhiteSpace), но вылетают
+            // на SaveChanges как DbUpdateException на второй вставке.
+            if (string.IsNullOrWhiteSpace(counterparty.Inn)) counterparty.Inn = null;
+            if (counterparty.Inn != null &&
                 _ctx.Counterparties.Any(x => x.Inn == counterparty.Inn))
             {
                 throw new InvalidOperationException(
@@ -51,10 +56,11 @@ namespace AhuErp.Core.Services
             if (existing == null)
                 throw new InvalidOperationException($"Контрагент id={counterparty.Id} не найден.");
 
-            // Если ИНН поменялся на непустой и совпадает с другим контрагентом —
-            // запрещаем (Add делает то же самое; уникальность ИНН — бизнес-инвариант,
-            // дублировать его обходом через Update нельзя).
-            if (!string.IsNullOrWhiteSpace(counterparty.Inn) &&
+            // Так же нормализуем пустой ИНН → null для согласованности с filtered
+            // unique-индексом в БД. После этого проверяем уникальность только
+            // для непустого (и изменившегося) ИНН.
+            if (string.IsNullOrWhiteSpace(counterparty.Inn)) counterparty.Inn = null;
+            if (counterparty.Inn != null &&
                 !string.Equals(existing.Inn, counterparty.Inn, StringComparison.Ordinal) &&
                 _ctx.Counterparties.Any(x => x.Id != counterparty.Id && x.Inn == counterparty.Inn))
             {

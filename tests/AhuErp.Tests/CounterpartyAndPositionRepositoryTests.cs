@@ -58,6 +58,22 @@ namespace AhuErp.Tests
         }
 
         [Fact]
+        public void Counterparty_Add_normalizes_blank_inn_to_null()
+        {
+            // WPF TextBox обычно даёт "" вместо null при пустом поле.
+            // Должны нормализовать в null, чтобы поведение совпадало с
+            // filtered unique-индексом в БД (WHERE Inn IS NOT NULL).
+            var repo = new InMemoryCounterpartyRepository();
+            var saved = repo.Add(new Counterparty { ShortName = "Без ИНН (пустая строка)", Inn = "", IsActive = true });
+            Assert.Null(saved.Inn);
+
+            // И повторное добавление с пустой строкой не должно ломаться
+            // (две записи с Inn = null разрешены).
+            repo.Add(new Counterparty { ShortName = "Тоже без ИНН", Inn = "   ", IsActive = true });
+            Assert.Equal(2, repo.List(activeOnly: false).Count);
+        }
+
+        [Fact]
         public void Counterparty_FindByInn_returns_null_for_blank_or_unknown()
         {
             var repo = new InMemoryCounterpartyRepository();

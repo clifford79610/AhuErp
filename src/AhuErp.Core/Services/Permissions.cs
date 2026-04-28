@@ -103,8 +103,10 @@ namespace AhuErp.Core.Services
         /// Все назначенные роли разрешения. Удобно для отладки и UI «что я могу».
         /// </summary>
         public static IReadOnlyCollection<string> ListFor(EmployeeRole role) =>
+            // Возвращаем КОПИЮ — иначе вызывающий код может через downcast
+            // к ICollection<string> отредактировать глобальную карту прав.
             _grants.TryGetValue(role, out var set)
-                ? (IReadOnlyCollection<string>)set
-                : new HashSet<string>();
+                ? new System.Collections.ObjectModel.ReadOnlyCollection<string>(new List<string>(set))
+                : System.Array.AsReadOnly(new string[0]);
     }
 }
