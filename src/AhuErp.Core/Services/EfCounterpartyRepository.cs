@@ -1,0 +1,74 @@
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using AhuErp.Core.Data;
+using AhuErp.Core.Models;
+
+namespace AhuErp.Core.Services
+{
+    /// <summary>
+    /// EF6-реализация <see cref="ICounterpartyRepository"/>. Использует
+    /// singleton <see cref="AhuDbContext"/>, как и другие Ef-репозитории.
+    /// </summary>
+    public sealed class EfCounterpartyRepository : ICounterpartyRepository
+    {
+        private readonly AhuDbContext _ctx;
+
+        public EfCounterpartyRepository(AhuDbContext ctx)
+        {
+            _ctx = ctx ?? throw new ArgumentNullException(nameof(ctx));
+        }
+
+        public IReadOnlyList<Counterparty> List(bool activeOnly)
+        {
+            IQueryable<Counterparty> q = _ctx.Counterparties.AsNoTracking();
+            if (activeOnly) q = q.Where(x => x.IsActive);
+            return q.OrderBy(x => x.ShortName).ToList().AsReadOnly();
+        }
+
+        public Counterparty Get(int id) =>
+            _ctx.Counterparties.AsNoTracking().FirstOrDefault(x => x.Id == id);
+
+        public Counterparty Add(Counterparty counterparty)
+        {
+            if (counterparty == null) throw new ArgumentNullException(nameof(counterparty));
+            if (!string.IsNullOrWhiteSpace(counterparty.Inn) &&
+                _ctx.Counterparties.Any(x => x.Inn == counterparty.Inn))
+            {
+                throw new InvalidOperationException(
+                    $"Контрагент с ИНН '{counterparty.Inn}' уже существует.");
+            }
+            _ctx.Counterparties.Add(counterparty);
+            _ctx.SaveChanges();
+            return counterparty;
+        }
+
+        public Counterparty Update(Counterparty counterparty)
+        {
+            if (counterparty == null) throw new ArgumentNullException(nameof(counterparty));
+            var existing = _ctx.Counterparties.FirstOrDefault(x => x.Id == counterparty.Id);
+            if (existing == null)
+                throw new InvalidOperationException($"Контрагент id={counterparty.Id} не найден.");
+
+            existing.ShortName = counterparty.ShortName;
+            existing.FullName = counterparty.FullName;
+            existing.Inn = counterparty.Inn;
+            existing.Kpp = counterparty.Kpp;
+            existing.Ogrn = counterparty.Ogrn;
+            existing.Address = counterparty.Address;
+            existing.Phone = counterparty.Phone;
+            existing.Email = counterparty.Email;
+            existing.Kind = counterparty.Kind;
+            existing.IsActive = counterparty.IsActive;
+            _ctx.SaveChanges();
+            return existing;
+        }
+
+        public Counterparty FindByInn(string inn)
+        {
+            if (string.IsNullOrWhiteSpace(inn)) return null;
+            return _ctx.Counterparties.AsNoTracking().FirstOrDefault(x => x.Inn == inn);
+        }
+    }
+}
