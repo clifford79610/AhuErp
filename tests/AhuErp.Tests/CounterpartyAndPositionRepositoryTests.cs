@@ -90,6 +90,23 @@ namespace AhuErp.Tests
         }
 
         [Fact]
+        public void Counterparty_Update_rejects_inn_belonging_to_another_record()
+        {
+            var repo = new InMemoryCounterpartyRepository();
+            var first = repo.Add(new Counterparty { ShortName = "Один", Inn = "7701111111", IsActive = true });
+            var second = repo.Add(new Counterparty { ShortName = "Два", Inn = "7702222222", IsActive = true });
+
+            // Передаём НОВЫЙ объект (не by-ref): хотим переписать second.Inn на ИНН first.
+            var attempt = new Counterparty { Id = second.Id, ShortName = "Два", Inn = first.Inn, IsActive = true };
+            Assert.Throws<InvalidOperationException>(() => repo.Update(attempt));
+
+            // Свой собственный ИНН (для same record) — разрешено.
+            var keepOwnInn = new Counterparty { Id = first.Id, ShortName = "Переименовали", Inn = first.Inn, IsActive = true };
+            repo.Update(keepOwnInn);
+            Assert.Equal("Переименовали", repo.Get(first.Id).ShortName);
+        }
+
+        [Fact]
         public void Counterparty_Add_rejects_blank_short_name()
         {
             var repo = new InMemoryCounterpartyRepository();

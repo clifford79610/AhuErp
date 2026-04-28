@@ -51,6 +51,17 @@ namespace AhuErp.Core.Services
             if (existing == null)
                 throw new InvalidOperationException($"Контрагент id={counterparty.Id} не найден.");
 
+            // Если ИНН поменялся на непустой и совпадает с другим контрагентом —
+            // запрещаем (Add делает то же самое; уникальность ИНН — бизнес-инвариант,
+            // дублировать его обходом через Update нельзя).
+            if (!string.IsNullOrWhiteSpace(counterparty.Inn) &&
+                !string.Equals(existing.Inn, counterparty.Inn, StringComparison.Ordinal) &&
+                _ctx.Counterparties.Any(x => x.Id != counterparty.Id && x.Inn == counterparty.Inn))
+            {
+                throw new InvalidOperationException(
+                    $"Контрагент с ИНН '{counterparty.Inn}' уже существует.");
+            }
+
             existing.ShortName = counterparty.ShortName;
             existing.FullName = counterparty.FullName;
             existing.Inn = counterparty.Inn;

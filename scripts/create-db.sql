@@ -534,8 +534,13 @@ BEGIN
         Email     NVARCHAR(256)  NULL,
         Kind      INT            NOT NULL,           -- CounterpartyKind: Organization=0, SoleProprietor=1, Individual=2, GovernmentBody=3
         IsActive  BIT            NOT NULL DEFAULT 1,
-        CONSTRAINT PK_dbo_Counterparties PRIMARY KEY CLUSTERED (Id ASC),
+        CONSTRAINT PK_dbo_Counterparties PRIMARY KEY CLUSTERED (Id ASC)
     );
+    -- Filtered unique-индекс по ИНН: дубликаты запрещены в БД,
+    -- но контрагенты без ИНН (физлица) разрешены.
+    CREATE UNIQUE NONCLUSTERED INDEX UX_Counterparties_Inn
+        ON dbo.Counterparties (Inn)
+        WHERE Inn IS NOT NULL;
 END
 GO
 
@@ -548,7 +553,7 @@ BEGIN
         [Name]   NVARCHAR(256)  NOT NULL,
         Category NVARCHAR(64)   NULL,
         IsActive BIT            NOT NULL DEFAULT 1,
-        CONSTRAINT PK_dbo_Positions PRIMARY KEY CLUSTERED (Id ASC),
+        CONSTRAINT PK_dbo_Positions PRIMARY KEY CLUSTERED (Id ASC)
     );
 END
 GO
