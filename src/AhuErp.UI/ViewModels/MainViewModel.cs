@@ -113,14 +113,15 @@ namespace AhuErp.UI.ViewModels
             catch { /* Лента уведомлений не должна валить main loop. */ }
         }
 
-        [RelayCommand]
-        private void ToggleNotifications()
+        // Хук [ObservableProperty] от CommunityToolkit.Mvvm: вызывается при
+        // изменении IsNotificationsOpen. ToggleButton bell-icon биндится
+        // напрямую к IsNotificationsOpen (Mode=TwoWay), поэтому отдельная
+        // ToggleNotificationsCommand была мёртвым кодом — а пользователю
+        // важно видеть свежий список в момент открытия попапа, не ждать
+        // следующего тика DispatcherTimer (≤60 секунд).
+        partial void OnIsNotificationsOpenChanged(bool value)
         {
-            IsNotificationsOpen = !IsNotificationsOpen;
-            if (IsNotificationsOpen)
-            {
-                SafeRefreshNotifications();
-            }
+            if (value) SafeRefreshNotifications();
         }
 
         [RelayCommand]
