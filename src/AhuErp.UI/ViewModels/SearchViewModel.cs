@@ -24,7 +24,8 @@ namespace AhuErp.UI.ViewModels
             null,
             DocumentDirection.Incoming,
             DocumentDirection.Outgoing,
-            DocumentDirection.Internal
+            DocumentDirection.Internal,
+            DocumentDirection.Directive,
         };
 
         public DocumentStatus?[] AvailableStatuses { get; } =

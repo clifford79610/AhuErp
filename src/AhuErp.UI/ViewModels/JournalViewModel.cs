@@ -105,6 +105,14 @@ namespace AhuErp.UI.ViewModels
             {
                 ErrorMessage = ex.Message;
             }
+            finally
+            {
+                // Reload вызывается из ApplyFilter и из всех OnXxxChanged
+                // (период, дело, OverdueOnly), а CanExport зависит от
+                // Items.Count — без явного NotifyCanExecuteChanged кнопка
+                // «Экспорт» оставалась бы в устаревшем состоянии.
+                ExportCommand.NotifyCanExecuteChanged();
+            }
         }
 
         [RelayCommand(CanExecute = nameof(CanExport))]
