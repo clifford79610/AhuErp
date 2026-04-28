@@ -86,6 +86,9 @@ namespace AhuErp.Core.Services
             foreach (var t in _tasks.ListMyTasks(employee.Id, MyTasksScope.AsExecutor))
             {
                 if (t.Status != DocumentTaskStatus.New) continue;
+                // Если поручение уже попало в ленту как «Просроченное», не дублируем
+                // его в ленте как «Новое» — overdue важнее и actionable.
+                if (liveKeys.Contains((NotificationKind.TaskOverdue, t.Id))) continue;
                 var key = (NotificationKind.TaskAssigned, t.Id);
                 liveKeys.Add(key);
                 if (_state.ContainsKey(key)) continue;

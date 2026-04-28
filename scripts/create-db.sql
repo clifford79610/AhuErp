@@ -528,7 +528,7 @@ BEGIN
         FullName  NVARCHAR(512)  NULL,
         Inn       NVARCHAR(12)   NULL,
         Kpp       NVARCHAR(9)    NULL,
-        Ogrn      NVARCHAR(13)   NULL,
+        Ogrn      NVARCHAR(15)   NULL,  -- ОГРН (13) или ОГРНИП (15)
         [Address] NVARCHAR(512)  NULL,
         Phone     NVARCHAR(64)   NULL,
         Email     NVARCHAR(256)  NULL,

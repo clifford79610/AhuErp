@@ -29,7 +29,11 @@ namespace AhuErp.Core.Models
         [StringLength(9)]
         public string Kpp { get; set; }
 
-        [StringLength(13)]
+        /// <summary>
+        /// ОГРН — 13 цифр для юр.лиц; для ИП — ОГРНИП (15 цифр), поэтому
+        /// длина поля задаётся 15 символов, чтобы покрыть оба формата.
+        /// </summary>
+        [StringLength(15)]
         public string Ogrn { get; set; }
 
         [StringLength(512)]

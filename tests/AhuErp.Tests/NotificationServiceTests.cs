@@ -141,6 +141,26 @@ namespace AhuErp.Tests
         }
 
         [Fact]
+        public void Refresh_does_not_duplicate_notification_for_overdue_New_task()
+        {
+            // Поручение в статусе New с прошедшим дедлайном попадает и в
+            // ListOverdue, и в ListMyTasks(AsExecutor) — но в ленте должно
+            // появиться один раз как «Просроченное», без дубликата «Новое».
+            _users.Current = _executor;
+            var doc = NewDoc();
+            _tasks.CreateTask(doc.Id, _author.Id, _executor.Id, "Z", DateTime.Now.AddSeconds(1));
+            var task = _tasksRepo.ListByDocument(doc.Id).Single();
+            task.Deadline = DateTime.Now.AddMinutes(-10);
+
+            _service.Refresh();
+
+            var list = _service.ListCurrent();
+            Assert.Single(list, n => n.TaskId == task.Id);
+            Assert.Equal(NotificationKind.TaskOverdue,
+                list.Single(n => n.TaskId == task.Id).Kind);
+        }
+
+        [Fact]
         public void Changed_event_fires_on_refresh()
         {
             _users.Current = _executor;
