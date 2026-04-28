@@ -120,7 +120,101 @@
         </Border>
 
         <Border Grid.Column="1" Background="{StaticResource Brush.Content.Background}">
-            <ContentControl Content="{Binding CurrentViewModel}" />
+            <DockPanel LastChildFill="True">
+                <!-- Верхняя панель: «колокольчик» уведомлений + popover. -->
+                <Border DockPanel.Dock="Top"
+                        Background="{StaticResource Brush.Sidebar.Background}"
+                        Padding="12,6">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding SelectedNavigationItem.Title}"
+                                   Foreground="{StaticResource Brush.Sidebar.Foreground}"
+                                   FontSize="14" VerticalAlignment="Center" />
+                        <Grid Grid.Column="1">
+                            <ToggleButton x:Name="BellButton"
+                                          IsChecked="{Binding IsNotificationsOpen, Mode=TwoWay}"
+                                          Background="Transparent"
+                                          BorderBrush="Transparent"
+                                          Foreground="{StaticResource Brush.Sidebar.Foreground}"
+                                          Padding="8,4"
+                                          Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🔔" FontSize="16" />
+                                    <Border Background="#E74C3C"
+                                            CornerRadius="8"
+                                            Padding="6,1"
+                                            Margin="6,0,0,0"
+                                            Visibility="{Binding UnreadNotificationCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                        <TextBlock Text="{Binding UnreadNotificationCount}"
+                                                   Foreground="White"
+                                                   FontSize="10"
+                                                   FontWeight="Bold" />
+                                    </Border>
+                                </StackPanel>
+                            </ToggleButton>
+                            <Popup IsOpen="{Binding IsChecked, ElementName=BellButton}"
+                                   StaysOpen="False"
+                                   Placement="Bottom"
+                                   PlacementTarget="{Binding ElementName=BellButton}"
+                                   AllowsTransparency="True">
+                                <Border Background="White"
+                                        BorderBrush="#CCCCCC"
+                                        BorderThickness="1"
+                                        Padding="12"
+                                        Width="380"
+                                        MaxHeight="420">
+                                    <DockPanel LastChildFill="True">
+                                        <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Уведомления"
+                                                       FontWeight="Bold"
+                                                       FontSize="13"
+                                                       VerticalAlignment="Center" />
+                                            <Button Grid.Column="1"
+                                                    Content="Прочитано"
+                                                    Padding="8,2"
+                                                    Command="{Binding MarkAllNotificationsReadCommand}" />
+                                        </Grid>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding Notifications}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border BorderBrush="#EEEEEE"
+                                                                BorderThickness="0,0,0,1"
+                                                                Padding="0,6">
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding Title}"
+                                                                           FontWeight="SemiBold" />
+                                                                <TextBlock Text="{Binding Body}"
+                                                                           TextWrapping="Wrap"
+                                                                           Foreground="#444"
+                                                                           FontSize="11" />
+                                                                <TextBlock Text="{Binding CreatedAt, StringFormat=g}"
+                                                                           Foreground="#888"
+                                                                           FontSize="10"
+                                                                           Margin="0,2,0,0" />
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DockPanel>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <ContentControl Content="{Binding CurrentViewModel}" />
+            </DockPanel>
         </Border>
     </Grid>
 </Window>

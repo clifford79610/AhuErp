@@ -7,6 +7,7 @@
         <ResourceDictionary>
             <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <conv:StringToVisibilityConverter  x:Key="StringToVisibilityConverter" />
+            <conv:IntToVisibilityConverter     x:Key="IntToVisibilityConverter" />
             <conv:OverdueRowColorConverter     x:Key="OverdueRowColorConverter" />
             <conv:EnumDisplayConverter         x:Key="EnumDisplayConverter" />
 
