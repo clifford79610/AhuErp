@@ -513,6 +513,11 @@ namespace AhuErp.UI.ViewModels
             Tasks.Clear();
             Approvals.Clear();
             History.Clear();
+            // Связанные операции (Tab 5) тоже сбрасываем — иначе при создании
+            // нового документа или после Reload() пользователь видит списания
+            // и путевые листы предыдущей карточки.
+            RelatedInventoryTx.Clear();
+            RelatedTrips.Clear();
         }
 
         private bool CanSave() => !string.IsNullOrWhiteSpace(DraftTitle);
