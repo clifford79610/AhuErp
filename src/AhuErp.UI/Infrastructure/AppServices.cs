@@ -52,6 +52,9 @@ namespace AhuErp.UI.Infrastructure
             services.AddSingleton<IEmployeeRepository, EfEmployeeRepository>();
             services.AddSingleton<IDocumentRepository, EfDocumentRepository>();
             services.AddSingleton<IAuthService, AuthService>();
+            // ICurrentUserService — тонкий read-only взгляд «кто я», тот же
+            // instance что и IAuthService (login обновляет CurrentEmployee).
+            services.AddSingleton<ICurrentUserService>(sp => sp.GetRequiredService<IAuthService>());
             services.AddSingleton<ArchiveService>();
             services.AddSingleton<IInventoryRepository, EfInventoryRepository>();
             services.AddSingleton<IInventoryService, InventoryService>();
@@ -78,6 +81,13 @@ namespace AhuErp.UI.Infrastructure
 
             services.AddSingleton<IApprovalRepository, EfApprovalRepository>();
             services.AddSingleton<IApprovalService, ApprovalService>();
+
+            // Foundation extras: уведомления (просрочки, новые поручения).
+            services.AddSingleton<INotificationService, NotificationService>();
+
+            // Foundation extras: справочники НСИ (контрагенты / должности).
+            services.AddSingleton<ICounterpartyRepository, EfCounterpartyRepository>();
+            services.AddSingleton<IPositionRepository, EfPositionRepository>();
 
             services.AddSingleton<IReportService>(sp => new ReportService(
                 sp.GetRequiredService<IInventoryRepository>(),

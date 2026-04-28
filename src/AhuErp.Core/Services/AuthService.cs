@@ -17,6 +17,12 @@ namespace AhuErp.Core.Services
 
         public Employee CurrentEmployee { get; private set; }
 
+        /// <inheritdoc />
+        public Employee Current => CurrentEmployee;
+
+        /// <inheritdoc />
+        public int? CurrentId => CurrentEmployee?.Id;
+
         public bool IsAuthenticated => CurrentEmployee != null;
 
         public LoginFailureReason LastFailureReason { get; private set; } = LoginFailureReason.None;

@@ -15,15 +15,19 @@ namespace AhuErp.Core.Services
 
     /// <summary>
     /// Сервис аутентификации и хранения текущего активного пользователя сессии.
+    /// Наследует <see cref="ICurrentUserService"/>: для бизнес-сервисов,
+    /// которым нужно только «кто я», достаточно зависеть от
+    /// <see cref="ICurrentUserService"/>, а полный контракт с логином/логаутом —
+    /// только у инфраструктуры аутентификации.
     /// </summary>
-    public interface IAuthService
+    public interface IAuthService : ICurrentUserService
     {
         /// <summary>
         /// Текущий вошедший сотрудник или <c>null</c>, если сессия не активна.
+        /// Дублирует <see cref="ICurrentUserService.Current"/>; оставлено для
+        /// совместимости с существующими VM/сервисами.
         /// </summary>
         Employee CurrentEmployee { get; }
-
-        bool IsAuthenticated { get; }
 
         /// <summary>
         /// Причина последней неуспешной попытки входа (или <see cref="LoginFailureReason.None"/>
