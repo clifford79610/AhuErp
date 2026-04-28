@@ -8,6 +8,9 @@
  *   4) 20260423175847_AddVehicleTripDriverName
  *   5) 20260426113552_AddArchiveRequestKind
  *   6) 20260426140000_AddEnterpriseEDMSFeatures (Phase 7)
+ *   7) Foundation extras: Counterparties + Positions (PR #3, миграция EF6
+ *      будет добавлена отдельным PR — на текущий момент схема актуальна
+ *      только в этом скрипте).
  *
  * Запуск в SQL Server Management Studio:
  *   1. Подключиться к DESKTOP-I1OTVEB\SQLEXPRESS (Windows Auth).
@@ -515,7 +518,47 @@ BEGIN
 END
 GO
 
-/* ---------- 15. (необязательно) лёгкий сид-набор для проверки ------------- */
+/* ---------- 15. Counterparties (Foundation extras, НСИ) -------------------- */
+IF OBJECT_ID(N'dbo.Counterparties', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Counterparties
+    (
+        Id        INT            IDENTITY(1, 1) NOT NULL,
+        ShortName NVARCHAR(256)  NOT NULL,
+        FullName  NVARCHAR(512)  NULL,
+        Inn       NVARCHAR(12)   NULL,
+        Kpp       NVARCHAR(9)    NULL,
+        Ogrn      NVARCHAR(15)   NULL,  -- ОГРН (13) или ОГРНИП (15)
+        [Address] NVARCHAR(512)  NULL,
+        Phone     NVARCHAR(64)   NULL,
+        Email     NVARCHAR(256)  NULL,
+        Kind      INT            NOT NULL,           -- CounterpartyKind: Organization=0, SoleProprietor=1, Individual=2, GovernmentBody=3
+        IsActive  BIT            NOT NULL DEFAULT 1,
+        CONSTRAINT PK_dbo_Counterparties PRIMARY KEY CLUSTERED (Id ASC)
+    );
+    -- Filtered unique-индекс по ИНН: дубликаты запрещены в БД,
+    -- но контрагенты без ИНН (физлица) разрешены.
+    CREATE UNIQUE NONCLUSTERED INDEX UX_Counterparties_Inn
+        ON dbo.Counterparties (Inn)
+        WHERE Inn IS NOT NULL;
+END
+GO
+
+/* ---------- 16. Positions (Foundation extras, НСИ) ------------------------- */
+IF OBJECT_ID(N'dbo.Positions', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Positions
+    (
+        Id       INT            IDENTITY(1, 1) NOT NULL,
+        [Name]   NVARCHAR(256)  NOT NULL,
+        Category NVARCHAR(64)   NULL,
+        IsActive BIT            NOT NULL DEFAULT 1,
+        CONSTRAINT PK_dbo_Positions PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+/* ---------- 17. (необязательно) лёгкий сид-набор для проверки ------------- */
 /* Расскоментируй блок ниже, если хочешь сразу получить несколько строк.
  * Пароль 'password' берётся из DemoDataSeeder; реальный хеш выставляет
  * приложение при первом запуске — здесь оставляем PasswordHash = NULL,

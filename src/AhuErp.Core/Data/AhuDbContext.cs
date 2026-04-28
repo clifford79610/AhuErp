@@ -54,12 +54,18 @@ namespace AhuErp.Core.Data
         public virtual DbSet<DocumentApproval> DocumentApprovals { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
+        // НСИ Foundation extras
+        public virtual DbSet<Counterparty> Counterparties { get; set; }
+        public virtual DbSet<Position> Positions { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
             modelBuilder.Entity<Employee>().ToTable("Employees");
             modelBuilder.Entity<Department>().ToTable("Departments");
+            modelBuilder.Entity<Counterparty>().ToTable("Counterparties");
+            modelBuilder.Entity<Position>().ToTable("Positions");
 
             modelBuilder.Entity<Document>()
                 .Map<Document>(m =>

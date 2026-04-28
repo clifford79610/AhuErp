@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 using AhuErp.Core.Services;
 using AhuErp.UI.Converters;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,8 +16,12 @@ namespace AhuErp.UI.ViewModels
     public partial class MainViewModel : ViewModelBase
     {
         private readonly IAuthService _auth;
+        private readonly INotificationService _notifications;
+        private readonly DispatcherTimer _notificationTimer;
 
         public ObservableCollection<NavigationItem> NavigationItems { get; }
+
+        public ObservableCollection<Notification> Notifications { get; } = new ObservableCollection<Notification>();
 
         [ObservableProperty]
         private NavigationItem selectedNavigationItem;
@@ -30,7 +35,14 @@ namespace AhuErp.UI.ViewModels
         [ObservableProperty]
         private string currentUserRoleDisplayName;
 
+        [ObservableProperty]
+        private int unreadNotificationCount;
+
+        [ObservableProperty]
+        private bool isNotificationsOpen;
+
         public MainViewModel(IAuthService auth,
+                             INotificationService notifications,
                              DashboardViewModel dashboardVm,
                              OfficeViewModel officeVm,
                              RkkViewModel rkkVm,
@@ -45,6 +57,7 @@ namespace AhuErp.UI.ViewModels
                              SearchViewModel searchVm)
         {
             _auth = auth ?? throw new ArgumentNullException(nameof(auth));
+            _notifications = notifications ?? throw new ArgumentNullException(nameof(notifications));
 
             NavigationItems = new ObservableCollection<NavigationItem>
             {
@@ -73,6 +86,48 @@ namespace AhuErp.UI.ViewModels
                     break;
                 }
             }
+
+            // Лента уведомлений: подписываемся на изменения и заводим
+            // DispatcherTimer на 60 секунд для автоматического Refresh.
+            _notifications.Changed += OnNotificationsChanged;
+            _notificationTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(60)
+            };
+            _notificationTimer.Tick += (s, e) => SafeRefreshNotifications();
+            _notificationTimer.Start();
+            SafeRefreshNotifications();
+        }
+
+        private void OnNotificationsChanged(object sender, EventArgs e)
+        {
+            UnreadNotificationCount = _notifications.UnreadCount;
+            Notifications.Clear();
+            foreach (var n in _notifications.ListCurrent()) Notifications.Add(n);
+        }
+
+        private void SafeRefreshNotifications()
+        {
+            // Не падаем если репозитории не готовы (например, без логина).
+            try { _notifications.Refresh(); }
+            catch { /* Лента уведомлений не должна валить main loop. */ }
+        }
+
+        // Хук [ObservableProperty] от CommunityToolkit.Mvvm: вызывается при
+        // изменении IsNotificationsOpen. ToggleButton bell-icon биндится
+        // напрямую к IsNotificationsOpen (Mode=TwoWay), поэтому отдельная
+        // ToggleNotificationsCommand была мёртвым кодом — а пользователю
+        // важно видеть свежий список в момент открытия попапа, не ждать
+        // следующего тика DispatcherTimer (≤60 секунд).
+        partial void OnIsNotificationsOpenChanged(bool value)
+        {
+            if (value) SafeRefreshNotifications();
+        }
+
+        [RelayCommand]
+        private void MarkAllNotificationsRead()
+        {
+            _notifications.MarkAllRead();
         }
 
         partial void OnSelectedNavigationItemChanged(NavigationItem value)
